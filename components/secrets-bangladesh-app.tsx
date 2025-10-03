@@ -370,17 +370,12 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
               className={`relative w-40 h-40 rounded-full transition-all ${
                 isRevealed ? "opacity-60" : "opacity-100 hover:scale-105"
               }`}
-              style={{
-                background: "radial-gradient(circle at 30% 30%, #b30000, #600000)",
-                boxShadow: "0 0 22px rgba(255, 0, 0, 0.35)",
-              }}
             >
-              <span
-                className="absolute inset-0 flex items-center justify-center text-[#FFD400] text-5xl font-bold"
-                style={{ fontFamily: "Georgia, serif", letterSpacing: "1px" }}
-              >
-                SB
-              </span>
+              <img
+                src="/assets/Secrets-wax-seal.png"
+                alt="Secrets Bangladesh Wax Seal"
+                className="w-full h-full object-contain drop-shadow-2xl"
+              />
             </button>
           </div>
 
@@ -655,7 +650,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                       id: "refugee-voices",
                       title: "Stories of Hope",
                       desc: "Listen to voices of resilience and community across generations.",
-                      image: "/tour-refugee-voices.jpeg",
+                      image: "/tour-voices-of-the-camps.jpeg", // Fixed image path
                     },
                     {
                       id: "sufi-saints",
@@ -1044,7 +1039,7 @@ function StoriesSection({ imgs }: { imgs: any }) {
       title: "Old Dhaka Self Guided Walk",
       type: "Audio",
       desc: "Navigate the winding lanes of Old Dhaka with this immersive audio guide through history and heritage.",
-      image: imgs.storyOldDhaka,
+      image: imgs.oldDhaka,
       audio: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Old-dhaka-self-guided-walk-nLctIcASHfeQwC04uhr44aTZ0LZEWn.mp3",
     },
     {
@@ -1132,6 +1127,25 @@ function StoriesSection({ imgs }: { imgs: any }) {
                 <div className="relative h-40 w-full bg-neutral-100 flex-shrink-0">
                   <SmartImg src={c.image} alt={c.title} className="h-full w-full object-cover" />
 
+                  {c.video && (
+                    <a
+                      href={c.video}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute top-2 right-2 w-10 h-10 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors z-10"
+                      title="Watch on YouTube"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="white"
+                        viewBox="0 0 24 24"
+                        className="w-5 h-5 ml-0.5"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </a>
+                  )}
+
                   {index === 0 && (
                     <div className="absolute top-2 right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg z-10">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" className="w-4 h-4">
@@ -1153,31 +1167,6 @@ function StoriesSection({ imgs }: { imgs: any }) {
                           <path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7z" />
                         </svg>
                       </div>
-                    </a>
-                  )}
-
-                  {c.video && (
-                    <a
-                      href={c.video}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute top-2 right-2 w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors z-10"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="white"
-                        viewBox="0 0 24 24"
-                        className="w-4 h-4 ml-0.5"
-                      >
-                        <path
-                          d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S13.38 6.5 12 6.5 9.5 7.62 9.5 9s1.12 2.5 2.5 2.5z"
-                          fill="#4285F4"
-                        />
-                        <path
-                          d="M12 11.5c1.38 0 2.5-1.12 2.5-2.5S13.38 6.5 12 6.5 9.5 7.62 9.5 9s1.12 2.5 2.5 2.5z"
-                          fill="#EA4335"
-                        />
-                      </svg>
                     </a>
                   )}
                 </div>
@@ -1377,7 +1366,7 @@ function AccountSection() {
     e.preventDefault()
     // Simple login - store in localStorage
     const userData = { email, name: name || email.split("@")[0] }
-    localStorage.setItem("secrets_user", JSON.stringify(userData))
+    localStorage.setItem("secrets_user", JSON.JSON.stringify(userData))
     setIsLoggedIn(true)
   }
 
