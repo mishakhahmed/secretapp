@@ -618,21 +618,107 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                   Reconnected • Memory Album
                 </h2>
                 <p className="text-white/90 text-sm mb-4">To reconnect is to remember. Gather stories, pass them on.</p>
-                <div className="grid grid-cols-1 gap-3">
+
+                <div className="grid grid-cols-1 gap-4">
                   {[
-                    { title: "Family Kitchen", desc: "Recipes as memory." },
-                    { title: "Jamdani Home", desc: "Weave & tea." },
-                    { title: "Old Dhaka Walk", desc: "Alleys & spice." },
+                    {
+                      id: "old-dhaka",
+                      title: "Spice Lane Memory",
+                      desc: "Fragrant alleys where history whispers through rose attar and cardamom.",
+                      image: imgs.oldDhaka,
+                    },
+                    {
+                      id: "panam-sonargaon",
+                      title: "Golden Capital Echo",
+                      desc: "Step into a city of whispers — decayed palaces, fading frescoes.",
+                      image: imgs.panam,
+                    },
+                    {
+                      id: "fishermens-secret",
+                      title: "Dawn Net Ritual",
+                      desc: "Cast nets at blue hour and taste the first catch with local boatmen.",
+                      image: imgs.fishermen1,
+                    },
+                    {
+                      id: "culinary-pilgrimage",
+                      title: "Family Kitchen Secret",
+                      desc: "Recipes as memory. Cook with families who've kept traditions alive.",
+                      image: imgs.culinary,
+                    },
+                    {
+                      id: "jamdani-loom",
+                      title: "Weaver's Thread",
+                      desc: "Watch silk transform into poetry on ancient looms.",
+                      image: imgs.jamdani1,
+                    },
+                    {
+                      id: "refugee-voices",
+                      title: "Stories of Hope",
+                      desc: "Listen to voices of resilience and community across generations.",
+                      image: "/tour-refugee-voices.jpeg",
+                    },
+                    {
+                      id: "sufi-saints",
+                      title: "Blue Hour Devotion",
+                      desc: "Sufi songs by the water as lanterns drift into twilight.",
+                      image: imgs.sufi,
+                    },
                   ].map((memory) => (
-                    <div key={memory.title} className="bg-[#111] border border-[#3a3a3a] rounded-xl p-4">
-                      <h3 className="text-white font-semibold text-sm">{memory.title}</h3>
-                      <p className="text-white/70 text-xs mt-1">{memory.desc}</p>
-                      <button
-                        onClick={() => addToBasket(memory.title)}
-                        className="mt-2 bg-[#FFD400] text-black font-bold px-4 py-2 rounded-lg hover:bg-[#ffd400]/90 transition-colors text-xs min-h-[36px]"
-                      >
-                        Add
-                      </button>
+                    <div
+                      key={memory.id}
+                      className="flip-card"
+                      onClick={(e) => {
+                        const card = e.currentTarget
+                        card.classList.toggle("flipped")
+                      }}
+                    >
+                      <div className="flip-card-inner">
+                        {/* Front Face */}
+                        <div className="flip-card-front relative">
+                          <SmartImg src={memory.image} alt={memory.title} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 p-4">
+                            <h3 className="text-white font-bold text-lg drop-shadow-lg">{memory.title}</h3>
+                            <p className="text-white/90 text-sm drop-shadow">Tap to reveal</p>
+                          </div>
+                        </div>
+
+                        {/* Back Face */}
+                        <div className="flip-card-back border-2 border-[#FFD400]">
+                          <h3 className="text-black font-bold text-lg mb-3">{memory.title}</h3>
+                          <p className="text-neutral-700 text-sm leading-relaxed mb-4 flex-1">{memory.desc}</p>
+                          <div className="space-y-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                const waLink = `https://wa.me/8801322649020?text=I want to book ${memory.title} - Secrets Bangladesh`
+                                window.open(waLink, "_blank")
+                              }}
+                              className="w-full bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors text-sm min-h-[44px]"
+                            >
+                              Enquire Now
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                addToBasket(memory.title)
+                              }}
+                              className="w-full bg-white border-2 border-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#FFD400]/10 transition-colors text-sm min-h-[44px]"
+                            >
+                              Add to Inspiration
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                trackEvent("Unfold Story", memory.title)
+                              }}
+                              className="w-full bg-white border-2 border-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#FFD400]/10 transition-colors text-sm min-h-[44px]"
+                            >
+                              Unfold Story
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
