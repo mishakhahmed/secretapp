@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secrets Cinematic Archive</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Playfair Display', Georgia, serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    .scene {
+      min-height: 160vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .scene.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scene.dark {
+      background-color: #000;
+    }
+
+    .scene.light {
+      background-color: #fff;
+      color: #000;
+    }
+
+    .scene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom right, rgba(0,0,0,0.4), transparent);
+      pointer-events: none;
+    }
+
+    .scene-title {
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      font-weight: bold;
+      color: #FFD400;
+      margin-bottom: 1rem;
+      z-index: 1;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .scene.light .scene-title {
+      color: #000;
+      text-shadow: none;
+    }
+
+    .scene-note {
+      font-size: clamp(1rem, 4vw, 1.25rem);
+      max-width: 600px;
+      margin: 0.5rem auto;
+      line-height: 1.6;
+      z-index: 1;
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
+    }
+
+    .scene.active .scene-note:nth-of-type(1) {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .scene.active .scene-note:nth-of-type(2) {
+      opacity: 1;
+      transform: translateX(0);
+      transition-delay: 0.5s;
+    }
+
+    .scene.light .scene-note {
+      color: #333;
+    }
+
+    .scene-label {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 300;
+      z-index: 1;
+      opacity: 0.7;
+    }
+
+    .scene.light .scene-label {
+      color: #666;
+    }
+
+    .mystery-icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 20vw;
+      font-weight: bold;
+      opacity: 0.1;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @media (max-width: 768px) {
+      .scene {
+        min-height: 140vh;
+        padding: 1.5rem;
+      }
+
+      .scene-note {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scene 1: Jamdani -->
+  <div class="scene dark" style="background-image: url('/tour-jamdani-loom-1.jpeg');">
+    <h2 class="scene-title">Jamdani Secrets</h2>
+    <p class="scene-note">🧵 Threads carry time in silence.</p>
+    <p class="scene-note">Every weave is a whisper from Bengal's past.</p>
+    <div class="scene-label">Jamdani</div>
+  </div>
+
+  <!-- Scene 2: Fisherman -->
+  <div class="scene light" style="background-image: url('/tour-fishermens-secret-1.jpeg');">
+    <h2 class="scene-title">The Fisherman's Secret</h2>
+    <p class="scene-note">🌊 The river awakens before the city.</p>
+    <p class="scene-note">Boats drift like memories across dawn's water.</p>
+    <div class="scene-label">Fisherman</div>
+  </div>
+
+  <!-- Scene 3: Panam -->
+  <div class="scene dark" style="background-image: url('/tour-panam-sonargaon.jpeg');">
+    <h2 class="scene-title">Panam Nagar</h2>
+    <p class="scene-note">🏚 Lantern-lit alleys whisper merchant legacies.</p>
+    <p class="scene-note">Crumbling walls breathe forgotten trade stories.</p>
+    <div class="scene-label">Panam</div>
+  </div>
+
+  <!-- Scene 4: Old Dhaka -->
+  <div class="scene light" style="background-image: url('/tour-old-dhaka.jpeg');">
+    <h2 class="scene-title">Echoes of Old Dhaka</h2>
+    <p class="scene-note">🌶 A spice market whispers even when empty.</p>
+    <p class="scene-note">The scent of cardamom is memory itself.</p>
+    <div class="scene-label">Old Dhaka</div>
+  </div>
+
+  <!-- Scene 5: Culinary -->
+  <div class="scene dark" style="background-image: url('/tour-culinary-pilgrimage.jpeg');">
+    <h2 class="scene-title">Culinary Pilgrimage</h2>
+    <p class="scene-note">🍲 Kitchens keep memory alive with every flame.</p>
+    <p class="scene-note">Taste is the archive of the tongue.</p>
+    <div class="scene-label">Culinary</div>
+  </div>
+
+  <!-- Scene 6: Sufi -->
+  <div class="scene light" style="background-image: url('/tour-sufi-saints.jpeg');">
+    <h2 class="scene-title">Sufi Saints</h2>
+    <p class="scene-note">🕌 Chants weave silence into devotion.</p>
+    <p class="scene-note">Echoes of zikr ripple through eternity.</p>
+    <div class="scene-label">Sufi</div>
+  </div>
+
+  <!-- Scene 7: Camps -->
+  <div class="scene dark" style="background-image: url('/tour-voices-of-the-camps.jpeg');">
+    <h2 class="scene-title">Voices of the Camps</h2>
+    <p class="scene-note">🏕 Whispers carry stories of survival.</p>
+    <p class="scene-note">Every tent is a library of loss and hope.</p>
+    <div class="scene-label">Camps</div>
+    <div class="mystery-icon">?</div>
+  </div>
+
+  <!-- Scene 8: Memory Scape I -->
+  <div class="scene light">
+    <h2 class="scene-title">Memory Scape I</h2>
+    <p class="scene-note">✨ Stitched notes of forgotten times.</p>
+    <p class="scene-note">Fragments rearrange as if alive.</p>
+    <div class="scene-label">Memory I</div>
+  </div>
+
+  <!-- Scene 9: Memory Scape II -->
+  <div class="scene dark">
+    <h2 class="scene-title">Memory Scape II</h2>
+    <p class="scene-note">✍️ Letters drift, fall, then reform.</p>
+    <p class="scene-note">The archive itself is breathing.</p>
+    <div class="scene-label">Memory II</div>
+  </div>
+
+  <!-- Scene 10: Memory Scape III -->
+  <div class="scene light">
+    <h2 class="scene-title">Memory Scape III</h2>
+    <p class="scene-note">❓ A mystery remains unsolved.</p>
+    <p class="scene-note">Some secrets are not meant to be found.</p>
+    <div class="scene-label">Memory III</div>
+    <div class="mystery-icon">?</div>
+  </div>
+
+  <script>
+    // Intersection Observer for scene activation
+    const scenes = document.querySelectorAll('.scene');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, {
+      threshold: 0.5
+    });
+
+    scenes.forEach(scene => {
+      observer.observe(scene);
+    });
+
+    // Activate first scene immediately
+    if (scenes.length > 0) {
+      scenes[0].classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

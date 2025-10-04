@@ -257,6 +257,7 @@ function MoodCard({ mood, onSelect }: any) {
 
 /* ===================== INSPIRE (Full Mood Pathways) ===================== */
 function Inspire({ onPickMood, goExperiences, imgs }: any) {
+  const [step, setStep] = useState<"seal" | "mood" | "pathway">("seal")
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
   const [isRevealed, setIsRevealed] = useState(false)
   const [hoverStartTime, setHoverStartTime] = useState<number | null>(null)
@@ -273,7 +274,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
 
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood)
-    setIsRevealed(false) // Reset revealed state when mood changes
+    setTimeout(() => setStep("pathway"), 800)
     trackEvent("Mood Selected", mood)
   }
 
@@ -291,13 +292,9 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   }
 
   const handleSealClick = () => {
-    if (!selectedMood) {
-      alert("Pick a mood first 🙂")
-      return
-    }
-    setIsRevealed(true)
+    setStep("mood")
     const dwellTime = hoverStartTime ? Date.now() - hoverStartTime : 0
-    trackEvent("Seal Clicked", "Wax Seal", { dwell: `${dwellTime}ms`, mood: selectedMood })
+    trackEvent("Seal Clicked", "Wax Seal", { dwell: `${dwellTime}ms` })
     setHoverStartTime(null)
   }
 
@@ -390,471 +387,534 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
     <Screen>
       <div className="h-full flex flex-col overflow-hidden bg-[#0c0c0c]">
         <AppHeader title="Inspire Me" />
-        <div className="flex-1 overflow-y-auto px-4 pt-8 pb-28">
-          <h1
-            className="text-2xl font-bold text-center text-[#FFD400] leading-tight mb-2"
-            style={{ fontFamily: "Playfair Display, serif" }}
-          >
-            Every city keeps its secrets.
-          </h1>
-          <p className="text-center text-white/90 text-sm mb-6">
-            Let's discover yours — through a ritual, a mood, and a path.
-          </p>
 
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {moods.map((mood) => (
-              <button
-                key={mood}
-                onClick={() => handleMoodSelect(mood)}
-                className={`px-5 py-2.5 rounded-full border transition-all min-h-[44px] ${
-                  selectedMood === mood
-                    ? "bg-[#FFD400] text-black border-[#FFD400] font-bold"
-                    : "bg-transparent text-[#FFD400] border-[#FFD400]"
-                }`}
-              >
-                {mood}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex justify-center mb-6">
-            <button
-              onClick={handleSealClick}
-              onMouseEnter={handleSealHoverStart}
-              onMouseLeave={handleSealHoverEnd}
-              onTouchStart={handleSealHoverStart}
-              onTouchEnd={handleSealHoverEnd}
-              className={`relative w-40 h-40 rounded-full transition-all ${
-                isRevealed ? "opacity-60" : "opacity-100 hover:scale-105"
-              }`}
-            >
-              <img
-                src="/assets/Secrets-wax-seal.png"
-                alt="Secrets Bangladesh Wax Seal"
-                className="w-full h-full object-contain drop-shadow-2xl"
-              />
-            </button>
-          </div>
-
-          <p className="text-center text-white/80 text-sm mb-8">
-            Tap the seal to begin. Your path adapts to the mood you chose.
-          </p>
-
-          {isRevealed && selectedMood === "Adventurous" && (
+        <AnimatePresence mode="wait">
+          {step === "seal" && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-4"
+              key="seal"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex-1 flex flex-col items-center justify-center px-4 pb-28"
             >
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h2 className="text-xl font-bold text-[#FFD400] mb-2" style={{ fontFamily: "Playfair Display, serif" }}>
-                  Adventurous • Waves
-                </h2>
-                <p className="text-white/90 text-sm mb-4">
-                  Step boldly. Each shuffle is a hidden corner. Your plan becomes your catch of the day.
-                </p>
-                {/* Waves animation */}
-                <div className="relative h-40 rounded-xl overflow-hidden bg-[#0f1c25] border border-[#3a3a3a] mb-4">
-                  <div
-                    className="absolute left-[-10%] right-[-10%] h-[60%] top-0 opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
-                    style={{
-                      background: "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
-                    }}
-                  />
-                  <div
-                    className="absolute left-[-10%] right-[-10%] h-[60%] top-[30%] opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
-                    style={{
-                      background: "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
-                      animationDelay: "-2s",
-                    }}
-                  />
-                  <div
-                    className="absolute left-[-10%] right-[-10%] h-[60%] top-[60%] opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
-                    style={{
-                      background: "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
-                      animationDelay: "-4s",
-                    }}
-                  />
-                </div>
-              </div>
+              <h1
+                className="text-2xl font-bold text-center text-[#FFD400] leading-tight mb-2"
+                style={{ fontFamily: "Playfair Display, serif" }}
+              >
+                Every city keeps its secrets.
+              </h1>
+              <p className="text-center text-white/90 text-sm mb-8">Break the seal to discover yours.</p>
 
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h3 className="text-lg font-bold text-[#FFD400] mb-3">Catch of the Day (Itinerary)</h3>
-                <div className="space-y-3">
-                  <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
-                    <div className="font-semibold text-white text-sm">MORNING — River Dawn</div>
-                    <div className="text-xs text-white/80 mt-1">
-                      Boat launch • Tea by the pier • Casting with fishermen
+              <button
+                onClick={handleSealClick}
+                onMouseEnter={handleSealHoverStart}
+                onMouseLeave={handleSealHoverEnd}
+                onTouchStart={handleSealHoverStart}
+                onTouchEnd={handleSealHoverEnd}
+                className="relative w-40 h-40 rounded-full transition-all hover:scale-105"
+              >
+                <img
+                  src="/assets/Secrets-wax-seal.png"
+                  alt="Secrets Bangladesh Wax Seal"
+                  className="w-full h-full object-contain drop-shadow-2xl"
+                />
+              </button>
+
+              <p className="text-center text-white/80 text-sm mt-8">Tap the seal to begin your journey</p>
+            </motion.div>
+          )}
+
+          {step === "mood" && (
+            <motion.div
+              key="mood"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex-1 flex flex-col items-center justify-center px-4 pb-28"
+            >
+              <h2 className="text-2xl text-[#FFD400] font-semibold mb-8">Choose your mood</h2>
+              <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                {moods.map((mood) => (
+                  <button
+                    key={mood}
+                    onClick={() => handleMoodSelect(mood)}
+                    className="px-6 py-4 rounded-xl border-2 border-[#FFD400] text-[#FFD400] hover:bg-[#FFD400] hover:text-black transition-all min-h-[44px] font-medium"
+                  >
+                    {mood}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {step === "pathway" && selectedMood && (
+            <motion.div
+              key="pathway"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="flex-1 overflow-y-auto px-4 pt-8 pb-28"
+            >
+              {selectedMood === "Inspire Me" && (
+                <div className="fixed inset-0 z-50 bg-black">
+                  <iframe
+                    src="/cinematic/index.html"
+                    title="Secrets Cinematic"
+                    className="w-full h-full border-none"
+                    allow="autoplay; fullscreen"
+                  />
+                  <button
+                    onClick={() => setStep("seal")}
+                    className="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="white"
+                      className="w-6 h-6"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              {selectedMood === "Adventurous" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4"
+                >
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h2
+                      className="text-xl font-bold text-[#FFD400] mb-2"
+                      style={{ fontFamily: "Playfair Display, serif" }}
+                    >
+                      Adventurous • Waves
+                    </h2>
+                    <p className="text-white/90 text-sm mb-4">
+                      Step boldly. Each shuffle is a hidden corner. Your plan becomes your catch of the day.
+                    </p>
+                    {/* Waves animation */}
+                    <div className="relative h-40 rounded-xl overflow-hidden bg-[#0f1c25] border border-[#3a3a3a] mb-4">
+                      <div
+                        className="absolute left-[-10%] right-[-10%] h-[60%] top-0 opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
+                        style={{
+                          background:
+                            "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
+                        }}
+                      />
+                      <div
+                        className="absolute left-[-10%] right-[-10%] h-[60%] top-[30%] opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
+                        style={{
+                          background:
+                            "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
+                          animationDelay: "-2s",
+                        }}
+                      />
+                      <div
+                        className="absolute left-[-10%] right-[-10%] h-[60%] top-[60%] opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
+                        style={{
+                          background:
+                            "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
+                          animationDelay: "-4s",
+                        }}
+                      />
                     </div>
                   </div>
-                  <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
-                    <div className="font-semibold text-white text-sm">AFTERNOON — Village Table</div>
-                    <div className="text-xs text-white/80 mt-1">Cook your catch • Stories from the riverfolk</div>
+
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h3 className="text-lg font-bold text-[#FFD400] mb-3">Catch of the Day (Itinerary)</h3>
+                    <div className="space-y-3">
+                      <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
+                        <div className="font-semibold text-white text-sm">MORNING — River Dawn</div>
+                        <div className="text-xs text-white/80 mt-1">
+                          Boat launch • Tea by the pier • Casting with fishermen
+                        </div>
+                      </div>
+                      <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
+                        <div className="font-semibold text-white text-sm">AFTERNOON — Village Table</div>
+                        <div className="text-xs text-white/80 mt-1">Cook your catch • Stories from the riverfolk</div>
+                      </div>
+                      <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
+                        <div className="font-semibold text-white text-sm">EVENING — Lantern Drift</div>
+                        <div className="text-xs text-white/80 mt-1">Slow float • Sufi songs by the water</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handlePathwayClick("Enquire Now")}
+                      className="w-full bg-[#FFD400] text-black font-bold px-6 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px] mt-4"
+                    >
+                      Enquire Now
+                    </button>
                   </div>
-                  <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
-                    <div className="font-semibold text-white text-sm">EVENING — Lantern Drift</div>
-                    <div className="text-xs text-white/80 mt-1">Slow float • Sufi songs by the water</div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => handlePathwayClick("Enquire Now")}
-                  className="w-full bg-[#FFD400] text-black font-bold px-6 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px] mt-4"
+                </motion.div>
+              )}
+
+              {selectedMood === "Curious" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4"
                 >
-                  Enquire Now
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h2
+                      className="text-xl font-bold text-[#FFD400] mb-2"
+                      style={{ fontFamily: "Playfair Display, serif" }}
+                    >
+                      Curious • Hidden Script
+                    </h2>
+                    <p className="text-white/90 text-sm mb-4">
+                      Lift the veil. Dhaka whispers to the ones who look closer.
+                    </p>
+                    <div className="space-y-2 bg-[#201d18] border border-[#3a3a3a] rounded-xl p-4">
+                      <details open className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
+                        <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
+                          Clue #1 — Panam Nagar
+                        </summary>
+                        <p className="text-white/80 text-xs mt-2">Ruins of merchants, lintels lacquered with time.</p>
+                      </details>
+                      <details className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
+                        <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
+                          Clue #2 — Armenian Church
+                        </summary>
+                        <p className="text-white/80 text-xs mt-2">Quiet courtyards, names carved into stone.</p>
+                      </details>
+                      <details className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
+                        <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
+                          Clue #3 — Chawk Bazaar
+                        </summary>
+                        <p className="text-white/80 text-xs mt-2">Spice and steam; a map written in aromas.</p>
+                      </details>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h3 className="text-lg font-bold text-[#FFD400] mb-2">Your Hidden Script (Plan)</h3>
+                    <p className="text-white/80 text-sm mb-4">
+                      These layers form tomorrow's path. Save or enquire to confirm.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => trackEvent("Save Plan", "Curious")}
+                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
+                      >
+                        Save Plan
+                      </button>
+                      <button
+                        onClick={() => handlePathwayClick("Enquire Now")}
+                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
+                      >
+                        Enquire Now
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {selectedMood === "Inspire Me" && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="fixed inset-0 z-50 bg-black"
+                >
+                  {/* Cinematic Archive Scroll */}
+                  <div className="h-full overflow-y-auto snap-y snap-mandatory">
+                    {/* Scene 1: Jamdani */}
+                    <CinematicScene
+                      image={imgs.jamdani1}
+                      title="Jamdani Secrets"
+                      note1="🧵 Threads carry time in silence."
+                      note2="Every weave is a whisper from Bengal's past."
+                      label="Jamdani"
+                      dark
+                    />
+
+                    {/* Scene 2: Fisherman */}
+                    <CinematicScene
+                      image={imgs.fishermen1}
+                      title="The Fisherman's Secret"
+                      note1="🌊 The river awakens before the city."
+                      note2="Boats drift like memories across dawn's water."
+                      label="Fisherman"
+                      light
+                    />
+
+                    {/* Scene 3: Panam */}
+                    <CinematicScene
+                      image={imgs.panam}
+                      title="Panam Nagar"
+                      note1="🏚 Lantern-lit alleys whisper merchant legacies."
+                      note2="Crumbling walls breathe forgotten trade stories."
+                      label="Panam"
+                      dark
+                    />
+
+                    {/* Scene 4: Old Dhaka */}
+                    <CinematicScene
+                      image={imgs.oldDhaka}
+                      title="Echoes of Old Dhaka"
+                      note1="🌶 A spice market whispers even when empty."
+                      note2="The scent of cardamom is memory itself."
+                      label="Old Dhaka"
+                      light
+                    />
+
+                    {/* Scene 5: Culinary */}
+                    <CinematicScene
+                      image={imgs.culinary}
+                      title="Culinary Pilgrimage"
+                      note1="🍲 Kitchens keep memory alive with every flame."
+                      note2="Taste is the archive of the tongue."
+                      label="Culinary"
+                      dark
+                    />
+
+                    {/* Scene 6: Sufi */}
+                    <CinematicScene
+                      image={imgs.sufi}
+                      title="Sufi Saints"
+                      note1="🕌 Chants weave silence into devotion."
+                      note2="Echoes of zikr ripple through eternity."
+                      label="Sufi"
+                      light
+                    />
+
+                    {/* Scene 7: Camps */}
+                    <CinematicScene
+                      image="/tour-voices-of-the-camps.jpeg"
+                      title="Voices of the Camps"
+                      note1="🏕 Whispers carry stories of survival."
+                      note2="Every tent is a library of loss and hope."
+                      label="Camps"
+                      dark
+                      mystery
+                    />
+
+                    {/* Scene 8: Memory Scape I */}
+                    <CinematicScene
+                      title="Memory Scape I"
+                      note1="✨ Stitched notes of forgotten times."
+                      note2="Fragments rearrange as if alive."
+                      label="Memory I"
+                      light
+                    />
+
+                    {/* Scene 9: Memory Scape II */}
+                    <CinematicScene
+                      title="Memory Scape II"
+                      note1="✍️ Letters drift, fall, then reform."
+                      note2="The archive itself is breathing."
+                      label="Memory II"
+                      dark
+                    />
+
+                    {/* Scene 10: Memory Scape III */}
+                    <CinematicScene
+                      title="Memory Scape III"
+                      note1="❓ A mystery remains unsolved."
+                      note2="Some secrets are not meant to be found."
+                      label="Memory III"
+                      light
+                      mystery
+                    />
+                  </div>
+
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setIsRevealed(false)}
+                    className="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="white"
+                      className="w-6 h-6"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </motion.div>
+              )}
+
+              {selectedMood === "Reconnected" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4"
+                >
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h2
+                      className="text-xl font-bold text-[#FFD400] mb-2"
+                      style={{ fontFamily: "Playfair Display, serif" }}
+                    >
+                      Reconnected • Memory Album
+                    </h2>
+                    <p className="text-white/90 text-sm mb-4">
+                      To reconnect is to remember. Gather stories, pass them on.
+                    </p>
+
+                    <div className="grid grid-cols-1 gap-4">
+                      {[
+                        {
+                          id: "old-dhaka",
+                          title: "Spice Lane Memory",
+                          desc: "Fragrant alleys where history whispers through rose attar and cardamom.",
+                          image: imgs.oldDhaka,
+                        },
+                        {
+                          id: "panam-sonargaon",
+                          title: "Golden Capital Echo",
+                          desc: "Step into a city of whispers — decayed palaces, fading frescoes.",
+                          image: imgs.panam,
+                        },
+                        {
+                          id: "fishermens-secret",
+                          title: "Dawn Net Ritual",
+                          desc: "Cast nets at blue hour and taste the first catch with local boatmen.",
+                          image: imgs.fishermen1,
+                        },
+                        {
+                          id: "culinary-pilgrimage",
+                          title: "Family Kitchen Secret",
+                          desc: "Recipes as memory. Cook with families who've kept traditions alive.",
+                          image: imgs.culinary,
+                        },
+                        {
+                          id: "jamdani-loom",
+                          title: "Weaver's Thread",
+                          desc: "Watch silk transform into poetry on ancient looms.",
+                          image: imgs.jamdani1,
+                        },
+                        {
+                          id: "refugee-voices",
+                          title: "Stories of Hope",
+                          desc: "Listen to voices of resilience and community across generations.",
+                          image: "/tour-voices-of-the-camps.jpeg", // Fixed image path
+                        },
+                        {
+                          id: "sufi-saints",
+                          title: "Blue Hour Devotion",
+                          desc: "Sufi songs by the water as lanterns drift into twilight.",
+                          image: imgs.sufi,
+                        },
+                      ].map((memory) => (
+                        <div
+                          key={memory.id}
+                          className="flip-card"
+                          onClick={(e) => {
+                            const card = e.currentTarget
+                            card.classList.toggle("flipped")
+                          }}
+                        >
+                          <div className="flip-card-inner">
+                            {/* Front Face */}
+                            <div className="flip-card-front relative">
+                              <SmartImg src={memory.image} alt={memory.title} className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                              <div className="absolute bottom-0 left-0 right-0 p-4">
+                                <h3 className="text-white font-bold text-lg drop-shadow-lg">{memory.title}</h3>
+                                <p className="text-white/90 text-sm drop-shadow">Tap to reveal</p>
+                              </div>
+                            </div>
+
+                            {/* Back Face */}
+                            <div className="flip-card-back border-2 border-[#FFD400]">
+                              <h3 className="text-black font-bold text-lg mb-3">{memory.title}</h3>
+                              <p className="text-neutral-700 text-sm leading-relaxed mb-4 flex-1">{memory.desc}</p>
+                              <div className="space-y-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    const waLink = `https://wa.me/8801322649020?text=I want to book ${memory.title} - Secrets Bangladesh`
+                                    window.open(waLink, "_blank")
+                                  }}
+                                  className="w-full bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors text-sm min-h-[44px]"
+                                >
+                                  Enquire Now
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    addToBasket(memory.title)
+                                  }}
+                                  className="w-full bg-white border-2 border-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#FFD400]/10 transition-colors text-sm min-h-[44px]"
+                                >
+                                  Add to Inspiration
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    trackEvent("Unfold Story", memory.title)
+                                  }}
+                                  className="w-full bg-white border-2 border-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#FFD400]/10 transition-colors text-sm min-h-[44px]"
+                                >
+                                  Unfold Story
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h3 className="text-lg font-bold text-[#FFD400] mb-3">Memory Basket (Plan)</h3>
+                    <div className="border-2 border-dashed border-[#FFD400] rounded-xl p-4 min-h-[60px] bg-[#121212] mb-4">
+                      {memoryBasket.length === 0 ? (
+                        <p className="text-white/60 text-sm">Add moments to build a shared plan…</p>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {memoryBasket.map((item) => (
+                            <span
+                              key={item}
+                              className="inline-block bg-[#FFD400] text-black rounded-full px-3 py-1.5 font-bold text-xs"
+                            >
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => trackEvent("Share with Friends", "Reconnected", memoryBasket.join(", "))}
+                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
+                      >
+                        Share with Friends
+                      </button>
+                      <button
+                        onClick={() => handlePathwayClick("Enquire Now")}
+                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
+                      >
+                        Enquire Now
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Back button */}
+              <div className="text-center mt-8">
+                <button
+                  onClick={() => setStep("mood")}
+                  className="text-[#FFD400] font-semibold hover:underline min-h-[44px] px-4"
+                >
+                  ← Change Mood
                 </button>
               </div>
             </motion.div>
           )}
-
-          {isRevealed && selectedMood === "Curious" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-4"
-            >
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h2 className="text-xl font-bold text-[#FFD400] mb-2" style={{ fontFamily: "Playfair Display, serif" }}>
-                  Curious • Hidden Script
-                </h2>
-                <p className="text-white/90 text-sm mb-4">Lift the veil. Dhaka whispers to the ones who look closer.</p>
-                <div className="space-y-2 bg-[#201d18] border border-[#3a3a3a] rounded-xl p-4">
-                  <details open className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
-                    <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">Clue #1 — Panam Nagar</summary>
-                    <p className="text-white/80 text-xs mt-2">Ruins of merchants, lintels lacquered with time.</p>
-                  </details>
-                  <details className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
-                    <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
-                      Clue #2 — Armenian Church
-                    </summary>
-                    <p className="text-white/80 text-xs mt-2">Quiet courtyards, names carved into stone.</p>
-                  </details>
-                  <details className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
-                    <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
-                      Clue #3 — Chawk Bazaar
-                    </summary>
-                    <p className="text-white/80 text-xs mt-2">Spice and steam; a map written in aromas.</p>
-                  </details>
-                </div>
-              </div>
-
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h3 className="text-lg font-bold text-[#FFD400] mb-2">Your Hidden Script (Plan)</h3>
-                <p className="text-white/80 text-sm mb-4">
-                  These layers form tomorrow's path. Save or enquire to confirm.
-                </p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => trackEvent("Save Plan", "Curious")}
-                    className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                  >
-                    Save Plan
-                  </button>
-                  <button
-                    onClick={() => handlePathwayClick("Enquire Now")}
-                    className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                  >
-                    Enquire Now
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {isRevealed && selectedMood === "Inspire Me" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="fixed inset-0 z-50 bg-black"
-            >
-              {/* Cinematic Archive Scroll */}
-              <div className="h-full overflow-y-auto snap-y snap-mandatory">
-                {/* Scene 1: Jamdani */}
-                <CinematicScene
-                  image={imgs.jamdani1}
-                  title="Jamdani Secrets"
-                  note1="🧵 Threads carry time in silence."
-                  note2="Every weave is a whisper from Bengal's past."
-                  label="Jamdani"
-                  dark
-                />
-
-                {/* Scene 2: Fisherman */}
-                <CinematicScene
-                  image={imgs.fishermen1}
-                  title="The Fisherman's Secret"
-                  note1="🌊 The river awakens before the city."
-                  note2="Boats drift like memories across dawn's water."
-                  label="Fisherman"
-                  light
-                />
-
-                {/* Scene 3: Panam */}
-                <CinematicScene
-                  image={imgs.panam}
-                  title="Panam Nagar"
-                  note1="🏚 Lantern-lit alleys whisper merchant legacies."
-                  note2="Crumbling walls breathe forgotten trade stories."
-                  label="Panam"
-                  dark
-                />
-
-                {/* Scene 4: Old Dhaka */}
-                <CinematicScene
-                  image={imgs.oldDhaka}
-                  title="Echoes of Old Dhaka"
-                  note1="🌶 A spice market whispers even when empty."
-                  note2="The scent of cardamom is memory itself."
-                  label="Old Dhaka"
-                  light
-                />
-
-                {/* Scene 5: Culinary */}
-                <CinematicScene
-                  image={imgs.culinary}
-                  title="Culinary Pilgrimage"
-                  note1="🍲 Kitchens keep memory alive with every flame."
-                  note2="Taste is the archive of the tongue."
-                  label="Culinary"
-                  dark
-                />
-
-                {/* Scene 6: Sufi */}
-                <CinematicScene
-                  image={imgs.sufi}
-                  title="Sufi Saints"
-                  note1="🕌 Chants weave silence into devotion."
-                  note2="Echoes of zikr ripple through eternity."
-                  label="Sufi"
-                  light
-                />
-
-                {/* Scene 7: Camps */}
-                <CinematicScene
-                  image="/tour-voices-of-the-camps.jpeg"
-                  title="Voices of the Camps"
-                  note1="🏕 Whispers carry stories of survival."
-                  note2="Every tent is a library of loss and hope."
-                  label="Camps"
-                  dark
-                  mystery
-                />
-
-                {/* Scene 8: Memory Scape I */}
-                <CinematicScene
-                  title="Memory Scape I"
-                  note1="✨ Stitched notes of forgotten times."
-                  note2="Fragments rearrange as if alive."
-                  label="Memory I"
-                  light
-                />
-
-                {/* Scene 9: Memory Scape II */}
-                <CinematicScene
-                  title="Memory Scape II"
-                  note1="✍️ Letters drift, fall, then reform."
-                  note2="The archive itself is breathing."
-                  label="Memory II"
-                  dark
-                />
-
-                {/* Scene 10: Memory Scape III */}
-                <CinematicScene
-                  title="Memory Scape III"
-                  note1="❓ A mystery remains unsolved."
-                  note2="Some secrets are not meant to be found."
-                  label="Memory III"
-                  light
-                  mystery
-                />
-              </div>
-
-              {/* Close Button */}
-              <button
-                onClick={() => setIsRevealed(false)}
-                className="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="white"
-                  className="w-6 h-6"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </motion.div>
-          )}
-
-          {isRevealed && selectedMood === "Reconnected" && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-4"
-            >
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h2 className="text-xl font-bold text-[#FFD400] mb-2" style={{ fontFamily: "Playfair Display, serif" }}>
-                  Reconnected • Memory Album
-                </h2>
-                <p className="text-white/90 text-sm mb-4">To reconnect is to remember. Gather stories, pass them on.</p>
-
-                <div className="grid grid-cols-1 gap-4">
-                  {[
-                    {
-                      id: "old-dhaka",
-                      title: "Spice Lane Memory",
-                      desc: "Fragrant alleys where history whispers through rose attar and cardamom.",
-                      image: imgs.oldDhaka,
-                    },
-                    {
-                      id: "panam-sonargaon",
-                      title: "Golden Capital Echo",
-                      desc: "Step into a city of whispers — decayed palaces, fading frescoes.",
-                      image: imgs.panam,
-                    },
-                    {
-                      id: "fishermens-secret",
-                      title: "Dawn Net Ritual",
-                      desc: "Cast nets at blue hour and taste the first catch with local boatmen.",
-                      image: imgs.fishermen1,
-                    },
-                    {
-                      id: "culinary-pilgrimage",
-                      title: "Family Kitchen Secret",
-                      desc: "Recipes as memory. Cook with families who've kept traditions alive.",
-                      image: imgs.culinary,
-                    },
-                    {
-                      id: "jamdani-loom",
-                      title: "Weaver's Thread",
-                      desc: "Watch silk transform into poetry on ancient looms.",
-                      image: imgs.jamdani1,
-                    },
-                    {
-                      id: "refugee-voices",
-                      title: "Stories of Hope",
-                      desc: "Listen to voices of resilience and community across generations.",
-                      image: "/tour-voices-of-the-camps.jpeg", // Fixed image path
-                    },
-                    {
-                      id: "sufi-saints",
-                      title: "Blue Hour Devotion",
-                      desc: "Sufi songs by the water as lanterns drift into twilight.",
-                      image: imgs.sufi,
-                    },
-                  ].map((memory) => (
-                    <div
-                      key={memory.id}
-                      className="flip-card"
-                      onClick={(e) => {
-                        const card = e.currentTarget
-                        card.classList.toggle("flipped")
-                      }}
-                    >
-                      <div className="flip-card-inner">
-                        {/* Front Face */}
-                        <div className="flip-card-front relative">
-                          <SmartImg src={memory.image} alt={memory.title} className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <h3 className="text-white font-bold text-lg drop-shadow-lg">{memory.title}</h3>
-                            <p className="text-white/90 text-sm drop-shadow">Tap to reveal</p>
-                          </div>
-                        </div>
-
-                        {/* Back Face */}
-                        <div className="flip-card-back border-2 border-[#FFD400]">
-                          <h3 className="text-black font-bold text-lg mb-3">{memory.title}</h3>
-                          <p className="text-neutral-700 text-sm leading-relaxed mb-4 flex-1">{memory.desc}</p>
-                          <div className="space-y-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                const waLink = `https://wa.me/8801322649020?text=I want to book ${memory.title} - Secrets Bangladesh`
-                                window.open(waLink, "_blank")
-                              }}
-                              className="w-full bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors text-sm min-h-[44px]"
-                            >
-                              Enquire Now
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                addToBasket(memory.title)
-                              }}
-                              className="w-full bg-white border-2 border-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#FFD400]/10 transition-colors text-sm min-h-[44px]"
-                            >
-                              Add to Inspiration
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                trackEvent("Unfold Story", memory.title)
-                              }}
-                              className="w-full bg-white border-2 border-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#FFD400]/10 transition-colors text-sm min-h-[44px]"
-                            >
-                              Unfold Story
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h3 className="text-lg font-bold text-[#FFD400] mb-3">Memory Basket (Plan)</h3>
-                <div className="border-2 border-dashed border-[#FFD400] rounded-xl p-4 min-h-[60px] bg-[#121212] mb-4">
-                  {memoryBasket.length === 0 ? (
-                    <p className="text-white/60 text-sm">Add moments to build a shared plan…</p>
-                  ) : (
-                    <div className="flex flex-wrap gap-2">
-                      {memoryBasket.map((item) => (
-                        <span
-                          key={item}
-                          className="inline-block bg-[#FFD400] text-black rounded-full px-3 py-1.5 font-bold text-xs"
-                        >
-                          {item}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => trackEvent("Share with Friends", "Reconnected", memoryBasket.join(", "))}
-                    className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                  >
-                    Share with Friends
-                  </button>
-                  <button
-                    onClick={() => handlePathwayClick("Enquire Now")}
-                    className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                  >
-                    Enquire Now
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {!isRevealed && (
-            <div className="text-center mt-8">
-              <p className="text-sm text-neutral-400 mb-2">Or browse experiences directly</p>
-              <button
-                onClick={goExperiences}
-                className="text-[#FFD400] font-semibold hover:underline min-h-[44px] px-4"
-              >
-                See All Experiences →
-              </button>
-            </div>
-          )}
-        </div>
+        </AnimatePresence>
       </div>
     </Screen>
   )
