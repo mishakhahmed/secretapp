@@ -250,19 +250,6 @@
     margin-top: 6px;
   }
 
-  /* Added ripple animation for Adventurous waves */
-  @keyframes ripple {
-    0% {
-      transform: translateX(-10%) scale(1);
-    }
-    50% {
-      transform: translateX(10%) scale(1.1);
-    }
-    100% {
-      transform: translateX(-10%) scale(1);
-    }
-  }
-
   /* Added flip card styles for Reconnected memory cards */
   .flip-card {
     perspective: 1000px;
@@ -303,5 +290,35 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
+  }
+
+  /* Added cinematic scroll animations for Inspire Me pathway */
+  @keyframes float {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-15px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .animate-float {
+    animation: float 4s infinite ease-in-out, pulse 2s infinite alternate;
+  }
+
+  .scale-120 {
+    transform: scale(1.2);
   }
 }

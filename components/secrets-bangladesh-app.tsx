@@ -329,6 +329,63 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
     }
   }
 
+  const CinematicScene = ({
+    image,
+    title,
+    note1,
+    note2,
+    label,
+    dark,
+    light,
+    mystery,
+  }: {
+    image?: string
+    title: string
+    note1: string
+    note2: string
+    label: string
+    dark?: boolean
+    light?: boolean
+    mystery?: boolean
+  }) => {
+    const isLight = light || (!dark && !mystery)
+    const textColorClass = isLight ? "text-black" : "text-white"
+    const noteColorClass = isLight ? "text-neutral-700" : "text-neutral-300"
+    const backdropClass = dark ? "bg-black/80" : isLight ? "bg-white/80" : "bg-black/60"
+    const mysteryOverlayClass = mystery
+      ? "after:content-['?'] after:absolute after:inset-0 after:flex after:items-center after:justify-center after:text-[20vw] after:font-bold after:opacity-20"
+      : ""
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.8 }}
+        className={`relative h-screen w-full snap-start flex flex-col items-center justify-center text-center p-8 ${backdropClass} ${mysteryOverlayClass}`}
+        style={{
+          backgroundImage: image ? `url(${image})` : undefined,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {image && <div className="absolute inset-0 bg-gradient-to-br from-black/40 to-transparent" />}
+        <h2
+          className={`text-4xl font-bold mb-2 drop-shadow-lg ${textColorClass}`}
+          style={{ fontFamily: "Playfair Display, serif" }}
+        >
+          {title}
+        </h2>
+        <p className={`text-lg mb-4 ${noteColorClass} max-w-md leading-relaxed`}>{note1}</p>
+        <p className={`text-lg ${noteColorClass} max-w-md leading-relaxed`}>{note2}</p>
+        <div
+          className={`absolute bottom-8 left-1/2 -translate-x-1/2 text-sm uppercase tracking-widest font-light ${noteColorClass}`}
+        >
+          {label}
+        </div>
+      </motion.div>
+    )
+  }
+
   return (
     <Screen>
       <div className="h-full flex flex-col overflow-hidden bg-[#0c0c0c]">
@@ -507,97 +564,128 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
 
           {isRevealed && selectedMood === "Inspire Me" && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="space-y-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="fixed inset-0 z-50 bg-black"
             >
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h2 className="text-xl font-bold text-[#FFD400] mb-2" style={{ fontFamily: "Playfair Display, serif" }}>
-                  Inspire Me • Jamdani Stitch
-                </h2>
-                <p className="text-white/90 text-sm mb-4">
-                  Your journey is not chosen. It is woven. Each secret stitches into the cloth of memory.
-                </p>
+              {/* Cinematic Archive Scroll */}
+              <div className="h-full overflow-y-auto snap-y snap-mandatory">
+                {/* Scene 1: Jamdani */}
+                <CinematicScene
+                  image={imgs.jamdani1}
+                  title="Jamdani Secrets"
+                  note1="🧵 Threads carry time in silence."
+                  note2="Every weave is a whisper from Bengal's past."
+                  label="Jamdani"
+                  dark
+                />
 
-                {/* Jamdani Loom Board */}
-                <div
-                  className="bg-[#111] border border-[#3a3a3a] rounded-xl p-4 mb-4"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(transparent 31px, rgba(255,212,0,0.3) 32px), linear-gradient(90deg, transparent 31px, rgba(255,212,0,0.25) 32px)",
-                    backgroundSize: "32px 32px, 32px 32px",
-                    backgroundRepeat: "repeat-y, repeat-x",
-                  }}
-                >
-                  {/* Swatches */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {["Panam", "Fisherman", "Jamdani", "Sufi", "Culinary", "Old Dhaka"].map((tile) => (
-                      <button
-                        key={tile}
-                        onClick={() => addToWeave(tile)}
-                        className={`px-3 py-2 rounded-lg border border-[#FFD400] font-bold text-xs transition-all min-h-[40px] ${
-                          weaveTiles.includes(tile)
-                            ? "bg-[#FFD400]/60 text-black/70"
-                            : "bg-gradient-to-br from-[#FFD400] to-[#f5b501] text-black"
-                        }`}
-                      >
-                        {tile}
-                      </button>
-                    ))}
-                  </div>
+                {/* Scene 2: Fisherman */}
+                <CinematicScene
+                  image={imgs.fishermen1}
+                  title="The Fisherman's Secret"
+                  note1="🌊 The river awakens before the city."
+                  note2="Boats drift like memories across dawn's water."
+                  label="Fisherman"
+                  light
+                />
 
-                  {/* Weave Grid */}
-                  <div className="grid grid-cols-6 gap-2 mb-3">
-                    {Array.from({ length: 12 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="bg-gradient-to-br from-[#222] to-[#333] border border-dashed border-[#FFD400] h-11 rounded-md flex items-center justify-center text-white text-[10px] font-medium"
-                      >
-                        {weaveTiles[i] || ""}
-                      </div>
-                    ))}
-                  </div>
+                {/* Scene 3: Panam */}
+                <CinematicScene
+                  image={imgs.panam}
+                  title="Panam Nagar"
+                  note1="🏚 Lantern-lit alleys whisper merchant legacies."
+                  note2="Crumbling walls breathe forgotten trade stories."
+                  label="Panam"
+                  dark
+                />
 
-                  {/* Progress Bar */}
-                  <div className="h-2 bg-[#333] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#FFD400] transition-all duration-300"
-                      style={{ width: `${Math.min((weaveTiles.length / 6) * 100, 100)}%` }}
-                    />
-                  </div>
-                </div>
+                {/* Scene 4: Old Dhaka */}
+                <CinematicScene
+                  image={imgs.oldDhaka}
+                  title="Echoes of Old Dhaka"
+                  note1="🌶 A spice market whispers even when empty."
+                  note2="The scent of cardamom is memory itself."
+                  label="Old Dhaka"
+                  light
+                />
 
-                <div className="flex gap-2 mb-4">
-                  <button
-                    onClick={clearWeave}
-                    className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                  >
-                    Clear Weave
-                  </button>
-                  <button
-                    onClick={() => trackEvent("Save Woven Plan", "Inspire Me", weaveTiles.join(" • "))}
-                    className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                  >
-                    Save Plan
-                  </button>
-                </div>
-                <button
-                  onClick={() => handlePathwayClick("Enquire Now")}
-                  className="w-full bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                >
-                  Enquire Now
-                </button>
+                {/* Scene 5: Culinary */}
+                <CinematicScene
+                  image={imgs.culinary}
+                  title="Culinary Pilgrimage"
+                  note1="🍲 Kitchens keep memory alive with every flame."
+                  note2="Taste is the archive of the tongue."
+                  label="Culinary"
+                  dark
+                />
+
+                {/* Scene 6: Sufi */}
+                <CinematicScene
+                  image={imgs.sufi}
+                  title="Sufi Saints"
+                  note1="🕌 Chants weave silence into devotion."
+                  note2="Echoes of zikr ripple through eternity."
+                  label="Sufi"
+                  light
+                />
+
+                {/* Scene 7: Camps */}
+                <CinematicScene
+                  image="/tour-voices-of-the-camps.jpeg"
+                  title="Voices of the Camps"
+                  note1="🏕 Whispers carry stories of survival."
+                  note2="Every tent is a library of loss and hope."
+                  label="Camps"
+                  dark
+                  mystery
+                />
+
+                {/* Scene 8: Memory Scape I */}
+                <CinematicScene
+                  title="Memory Scape I"
+                  note1="✨ Stitched notes of forgotten times."
+                  note2="Fragments rearrange as if alive."
+                  label="Memory I"
+                  light
+                />
+
+                {/* Scene 9: Memory Scape II */}
+                <CinematicScene
+                  title="Memory Scape II"
+                  note1="✍️ Letters drift, fall, then reform."
+                  note2="The archive itself is breathing."
+                  label="Memory II"
+                  dark
+                />
+
+                {/* Scene 10: Memory Scape III */}
+                <CinematicScene
+                  title="Memory Scape III"
+                  note1="❓ A mystery remains unsolved."
+                  note2="Some secrets are not meant to be found."
+                  label="Memory III"
+                  light
+                  mystery
+                />
               </div>
 
-              <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                <h3 className="text-lg font-bold text-[#FFD400] mb-2">Preview (Generated from stitches)</h3>
-                <p className="text-white/80 text-sm">
-                  {weaveTiles.length >= 3
-                    ? `Draft: ${weaveTiles.join(" • ")}`
-                    : "Select 3–6 swatches to weave your draft itinerary."}
-                </p>
-              </div>
+              {/* Close Button */}
+              <button
+                onClick={() => setIsRevealed(false)}
+                className="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="white"
+                  className="w-6 h-6"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </motion.div>
           )}
 
