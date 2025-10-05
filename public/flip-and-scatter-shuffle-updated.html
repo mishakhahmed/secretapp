@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secrets Cinematic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:'Inter',sans-serif;
+      background:#1a1410;
+      color:#fff;
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    /* ========== BACK BUTTON ========== */
+    #backButton {
+      position:fixed;
+      top:20px;
+      left:20px;
+      z-index:9999;
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      background:rgba(0,0,0,0.75);
+      backdrop-filter:blur(10px);
+      border:2px solid #FFD400;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      box-shadow:0 0 20px rgba(255,212,0,0.3);
+      animation:pulseGlow 2s ease-in-out infinite;
+    }
+    #backButton:hover {
+      background:rgba(255,212,0,0.2);
+      transform:scale(1.1);
+      box-shadow:0 0 30px rgba(255,212,0,0.5);
+    }
+    #backButton svg {
+      width:24px;
+      height:24px;
+      fill:#FFD400;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow:0 0 20px rgba(255,212,0,0.3); }
+      50% { box-shadow:0 0 30px rgba(255,212,0,0.6); }
+    }
+
+    /* ========== PHASE 1: SCATTERED CARDS ========== */
+    #cardDeck {
+      position:relative;
+      width:100vw;
+      height:100vh;
+      background:linear-gradient(135deg, #1a1410 0%, #2d1f1a 100%);
+      overflow:hidden;
+    }
+    .card {
+      position:absolute;
+      width:200px;
+      height:280px;
+      cursor:pointer;
+      transition:transform 0.6s cubic-bezier(0.68,-0.55,0.265,1.55), z-index 0s 0.3s;
+      transform-style:preserve-3d;
+    }
+    .card.flipped {
+      transform:rotateY(180deg) !important;
+    }
+    .card.zooming {
+      transition:all 1.2s cubic-bezier(0.68,-0.55,0.265,1.55);
+      transform:translate(-50%,-50%) scale(3) rotateY(180deg) !important;
+      left:50% !important;
+      top:50% !important;
+      z-index:9998 !important;
+    }
+    .card-face {
+      position:absolute;
+      width:100%;
+      height:100%;
+      backface-visibility:hidden;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 8px 30px rgba(0,0,0,0.5);
+    }
+    .card-front { background:#2a1810; }
+    .card-back { transform:rotateY(180deg); background:#f5deb3; }
+    .card-face img {
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    /* Hint button */
+    #hintBtn {
+      position:fixed;
+      bottom:40px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(255,212,0,0.15);
+      border:2px solid #FFD400;
+      color:#FFD400;
+      padding:12px 24px;
+      border-radius:30px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      z-index:100;
+      animation:pulse 2s ease-in-out infinite;
+      backdrop-filter:blur(10px);
+    }
+    @keyframes pulse {
+      0%, 100% { transform:translateX(-50%) scale(1); opacity:0.8; }
+      50% { transform:translateX(-50%) scale(1.05); opacity:1; }
+    }
+
+    /* Fireflies */
+    .firefly {
+      position:absolute;
+      width:3px;
+      height:3px;
+      background:#FFD400;
+      border-radius:50%;
+      opacity:0;
+      animation:float 8s ease-in-out infinite;
+      box-shadow:0 0 10px #FFD400;
+    }
+    @keyframes float {
+      0%, 100% { transform:translateY(0) translateX(0); opacity:0; }
+      10% { opacity:1; }
+      90% { opacity:1; }
+      100% { transform:translateY(-100vh) translateX(50px); opacity:0; }
+    }
+
+    /* ========== PHASE 2: CINEMATIC ARCHIVE ========== */
+    #cinematicArchive {
+      display:none;
+      opacity:0;
+      transition:opacity 1s ease;
+    }
+    #cinematicArchive.active {
+      display:block;
+      opacity:1;
+    }
+    .scene {
+      position:relative;
+      width:100%;
+      min-height:160vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:80px 20px;
+      opacity:0;
+      transform:scale(0.95);
+      transition:opacity 1s ease, transform 1s ease;
+    }
+    .scene.active {
+      opacity:1;
+      transform:scale(1);
+    }
+    .scene-bg {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      z-index:0;
+      transition:transform 2s ease;
+    }
+    .scene.active .scene-bg {
+      transform:scale(1.05);
+    }
+    .scene-overlay {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,0.6);
+      z-index:1;
+    }
+    .scene-content {
+      position:relative;
+      z-index:2;
+      max-width:900px;
+      text-align:center;
+    }
+    .scene-title {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(2.5rem,5vw,4rem);
+      color:#FFD400;
+      margin-bottom:40px;
+      text-shadow:2px 2px 20px rgba(0,0,0,0.8);
+    }
+    .note {
+      font-family:'Great Vibes',cursive;
+      font-size:clamp(1.2rem,2.5vw,1.8rem);
+      color:#f5deb3;
+      margin:20px 0;
+      padding:20px;
+      background:rgba(0,0,0,0.3);
+      border-radius:8px;
+      backdrop-filter:blur(5px);
+      opacity:0;
+      transform:translateX(-50px);
+      transition:all 0.8s ease;
+    }
+    .scene.active .note {
+      opacity:1;
+      transform:translateX(0);
+    }
+    .note:nth-child(3) { transition-delay:0.3s; }
+    .note:nth-child(4) { transition-delay:0.6s; }
+
+    .video-box {
+      margin:40px 0;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 10px 40px rgba(0,0,0,0.5);
+    }
+    .video-box video {
+      width:100%;
+      max-width:600px;
+      display:block;
+    }
+
+    .memory-frame {
+      margin:40px 0;
+      padding:20px;
+      border:3px dashed #FFD400;
+      border-radius:12px;
+      background:rgba(0,0,0,0.4);
+    }
+    .memory-frame img {
+      width:100%;
+      max-width:400px;
+      border-radius:8px;
+    }
+
+    .mystery-icon {
+      position:absolute;
+      top:40px;
+      right:40px;
+      width:50px;
+      height:50px;
+      background:#FFD400;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:28px;
+      font-weight:bold;
+      color:#1a1410;
+      cursor:pointer;
+      animation:floatMystery 3s ease-in-out infinite;
+      box-shadow:0 0 20px rgba(255,212,0,0.6);
+    }
+    @keyframes floatMystery {
+      0%, 100% { transform:translateY(0); }
+      50% { transform:translateY(-10px); }
+    }
+
+    /* Fade overlay for transition */
+    #fadeOverlay {
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:#000;
+      opacity:0;
+      pointer-events:none;
+      z-index:9997;
+      transition:opacity 1s ease;
+    }
+    #fadeOverlay.active {
+      opacity:1;
+    }
+
+    @media (max-width:768px) {
+      .card { width:150px; height:210px; }
+      .scene { min-height:120vh; padding:60px 15px; }
+      .scene-title { font-size:2rem; }
+      .note { font-size:1rem; }
+      .mystery-icon { width:40px; height:40px; font-size:22px; top:20px; right:20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Back Button -->
+<button id="backButton" aria-label="Go back">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+  </svg>
+</button>
+
+<!-- Fade Overlay -->
+<div id="fadeOverlay"></div>
+
+<!-- PHASE 1: Scattered Card Deck -->
+<div id="cardDeck">
+  <div class="card" data-front="/assets/cards/gamejamdani.jpg" data-back="/assets/cards/gamejamdaniside2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamefish.jpg" data-back="/assets/cards/gamefishside2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gameculinary.jpg" data-back="/assets/cards/gameculinaryside2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamesufi.jpg" data-back="/assets/cards/gamesufiside2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamerefugee.jpg" data-back="/assets/cards/gamerefugeeside2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamepanam.jpg" data-back="/assets/cards/gamepanamside2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gameolddhaka.jpg" data-back="/assets/cards/gameolddhakaside2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamememory1.jpg" data-back="/assets/cards/gamememory1side2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamememory2.jpg" data-back="/assets/cards/gamememory2side2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamememory3.jpg" data-back="/assets/cards/gamememory3side2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamememory4.jpg" data-back="/assets/cards/gamememory4side2.jpg"></div>
+  <div class="card" data-front="/assets/cards/gamememory5.jpg" data-back="/assets/cards/gamememory5side2.jpg"></div>
+
+  <button id="hintBtn">Discover the secret</button>
+</div>
+
+<!-- PHASE 2: Cinematic Archive -->
+<div id="cinematicArchive">
+  <!-- Scene 1: Old Dhaka -->
+  <section class="scene" data-scene="1">
+    <img src="/assets/scenes/old-dhaka.jpg" alt="Old Dhaka" class="scene-bg">
+    <div class="scene-overlay"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Old Dhaka Walk</h2>
+      <p class="note">Where spice-scented alleys whisper centuries of trade...</p>
+      <p class="note">And every corner hides a story waiting to unfold.</p>
+      <div class="video-box">
+        <video src="/assets/videos/old-dhaka.mp4" autoplay muted loop></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 2: Panam Nagar -->
+  <section class="scene" data-scene="2">
+    <img src="/assets/scenes/panam.jpg" alt="Panam Nagar" class="scene-bg">
+    <div class="scene-overlay"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Panam Nagar</h2>
+      <p class="note">Step into a city of whispers — decayed palaces, fading frescoes...</p>
+      <p class="note">A ghost town frozen in time.</p>
+      <div class="video-box">
+        <video src="/assets/videos/panam.mp4" autoplay muted loop></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 3: Fisherman's Secret -->
+  <section class="scene" data-scene="3">
+    <img src="/assets/scenes/fisherman.jpg" alt="Fisherman" class="scene-bg">
+    <div class="scene-overlay"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Fisherman's Secret</h2>
+      <p class="note">Before dawn breaks, nets are cast into the Meghna...</p>
+      <p class="note">Join the fishermen in their ancient ritual.</p>
+      <div class="video-box">
+        <video src="/assets/videos/fisherman.mp4" autoplay muted loop></video>
+      </div>
+    </div>
+    <a href="/stories" class="mystery-icon">?</a>
+  </section>
+
+  <!-- Scene 4: Culinary Pilgrimage -->
+  <section class="scene" data-scene="4">
+    <img src="/assets/scenes/culinary.jpg" alt="Culinary" class="scene-bg">
+    <div class="scene-overlay"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Culinary Pilgrimage</h2>
+      <p class="note">Taste the flavors that shaped a nation...</p>
+      <p class="note">From street-side biryani to royal feasts.</p>
+      <div class="video-box">
+        <video src="/assets/videos/culinary.mp4" autoplay muted loop></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 5: Jamdani Loom -->
+  <section class="scene" data-scene="5">
+    <img src="/assets/scenes/jamdani.jpg" alt="Jamdani" class="scene-bg">
+    <div class="scene-overlay"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Jamdani Loom</h2>
+      <p class="note">Watch master weavers create poetry in thread...</p>
+      <p class="note">Each pattern a secret passed through generations.</p>
+      <div class="video-box">
+        <video src="/assets/videos/jamdani.mp4" autoplay muted loop></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 6: Refugee Voices -->
+  <section class="scene" data-scene="6">
+    <img src="/assets/scenes/refugee.jpg" alt="Refugee" class="scene-bg">
+    <div class="scene-overlay"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Refugee Voices</h2>
+      <p class="note">Stories of resilience from those who crossed borders...</p>
+      <p class="note">Seeking hope in a new land.</p>
+      <div class="video-box">
+        <video src="/assets/videos/refugee.mp4" autoplay muted loop></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scene 7: Sufi Saints -->
+  <section class="scene" data-scene="7">
+    <img src="/assets/scenes/sufi.jpg" alt="Sufi" class="scene-bg">
+    <div class="scene-overlay"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Sufi Saints</h2>
+      <p class="note">Enter the mystical world of devotion and music...</p>
+      <p class="note">Where the divine meets the earthly.</p>
+      <div class="video-box">
+        <video src="/assets/videos/sufi.mp4" autoplay muted loop></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Memory Scape 1 -->
+  <section class="scene" data-scene="8">
+    <div class="scene-overlay" style="background:rgba(0,0,0,0.85);"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Memory Scape I</h2>
+      <div class="memory-frame">
+        <img src="/assets/gifs/memory1.gif" alt="memory shimmer">
+      </div>
+      <p class="note">Fragments of forgotten moments...</p>
+    </div>
+  </section>
+
+  <!-- Memory Scape 2 -->
+  <section class="scene" data-scene="9">
+    <div class="scene-overlay" style="background:rgba(0,0,0,0.85);"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Memory Scape II</h2>
+      <div class="memory-frame">
+        <img src="/assets/gifs/memory2.gif" alt="memory shimmer">
+      </div>
+      <p class="note">Echoes of lives once lived...</p>
+    </div>
+  </section>
+
+  <!-- Memory Scape 3 -->
+  <section class="scene" data-scene="10">
+    <div class="scene-overlay" style="background:rgba(0,0,0,0.85);"></div>
+    <div class="scene-content">
+      <h2 class="scene-title">Memory Scape III</h2>
+      <div class="memory-frame">
+        <img src="/assets/gifs/memory3.gif" alt="memory shimmer">
+      </div>
+      <p class="note">The past whispers through the present...</p>
+    </div>
+  </section>
+</div>
+
+<script>
+// ========== BACK BUTTON ==========
+document.getElementById('backButton').addEventListener('click', () => {
+  // Reload the page to reset the experience
+  window.location.reload()
+})
+
+// ========== PHASE 1: SCATTERED CARDS ==========
+const cardDeck = document.getElementById('cardDeck')
+const cards = document.querySelectorAll('.card')
+const fadeOverlay = document.getElementById('fadeOverlay')
+const cinematicArchive = document.getElementById('cinematicArchive')
+
+// Scatter cards randomly
+function scatterCards() {
+  cards.forEach((card, i) => {
+    const x = Math.random() * (window.innerWidth - 220) + 10
+    const y = Math.random() * (window.innerHeight - 300) + 10
+    const rot = (Math.random() - 0.5) * 30
+    card.style.left = x + 'px'
+    card.style.top = y + 'px'
+    card.style.transform = `rotate(${rot}deg)`
+    card.style.zIndex = i
+
+    // Load images
+    const front = card.dataset.front
+    const back = card.dataset.back
+    card.innerHTML = `
+      <div class="card-face card-front"><img src="${front}" alt="card front"></div>
+      <div class="card-face card-back"><img src="${back}" alt="card back"></div>
+    `
+  })
+}
+scatterCards()
+window.addEventListener('resize', scatterCards)
+
+// Card interaction: first click flips, second click zooms and transitions
+let flippedCard = null
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.classList.contains('zooming')) return
+
+    if (!card.classList.contains('flipped')) {
+      // First click: flip
+      card.classList.add('flipped')
+      flippedCard = card
+    } else {
+      // Second click: zoom and transition
+      card.classList.add('zooming')
+      fadeOverlay.classList.add('active')
+      setTimeout(() => {
+        cardDeck.style.display = 'none'
+        cinematicArchive.classList.add('active')
+        fadeOverlay.classList.remove('active')
+        observeScenes()
+      }, 1200)
+    }
+  })
+})
+
+// Fireflies
+for (let i = 0; i < 20; i++) {
+  const fly = document.createElement('div')
+  fly.className = 'firefly'
+  fly.style.left = Math.random() * 100 + '%'
+  fly.style.animationDelay = Math.random() * 8 + 's'
+  cardDeck.appendChild(fly)
+}
+
+// ========== PHASE 2: CINEMATIC ARCHIVE ==========
+function observeScenes() {
+  const scenes = document.querySelectorAll('.scene')
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active')
+      }
+    })
+  }, { threshold: 0.3 })
+
+  scenes.forEach(scene => observer.observe(scene))
+}
+</script>
+
+</body>
+</html>

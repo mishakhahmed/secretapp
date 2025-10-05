@@ -1,12 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
-
-export default function Home() {
-  useEffect(() => {
-    document.title = "Secrets Cinematic"
-  }, [])
-
+export default function ShuffleDeck() {
   return (
     <iframe
       src="/flip-and-scatter-shuffle-updated.html"
@@ -16,7 +10,7 @@ export default function Home() {
         height: "100vh",
         border: "none",
         display: "block",
-        background: "black",
+        background: "#1a1410",
       }}
       allow="autoplay; fullscreen"
     />
