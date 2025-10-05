@@ -1,24 +1,5 @@
-"use client"
+import SecretsBangladeshApp from "@/components/secrets-bangladesh-app"
 
-import { useEffect } from "react"
-
-export default function Home() {
-  useEffect(() => {
-    document.title = "Secrets Cinematic"
-  }, [])
-
-  return (
-    <iframe
-      src="/flip-and-scatter-shuffle-updated.html"
-      title="Secrets Cinematic"
-      style={{
-        width: "100vw",
-        height: "100vh",
-        border: "none",
-        display: "block",
-        background: "black",
-      }}
-      allow="autoplay; fullscreen"
-    />
-  )
+export default function Page() {
+  return <SecretsBangladeshApp />
 }
