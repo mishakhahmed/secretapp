@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jamdani Loom Ritual</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1410;
+      overflow: hidden;
+      font-family: 'Georgia', serif;
+    }
+    
+    .loom-container {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #2a2010 0%, #1a1410 100%);
+    }
+    
+    .loom-grid {
+      width: 80vmin;
+      height: 80vmin;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      gap: 2px;
+      opacity: 0;
+      animation: fadeIn 1s ease-out forwards;
+    }
+    
+    .loom-thread {
+      background: linear-gradient(135deg, #FFD400 0%, #FFA500 100%);
+      opacity: 0;
+      animation: weave 3s ease-in-out forwards;
+    }
+    
+    .loom-thread:nth-child(odd) {
+      animation-delay: calc(var(--i) * 0.05s);
+    }
+    
+    .loom-thread:nth-child(even) {
+      animation-delay: calc(var(--i) * 0.05s + 0.025s);
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    
+    @keyframes weave {
+      0% { opacity: 0; transform: scale(0) rotate(0deg); }
+      50% { opacity: 0.8; transform: scale(1.1) rotate(180deg); }
+      100% { opacity: 1; transform: scale(1) rotate(360deg); }
+    }
+    
+    .ritual-text {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #FFD400;
+      font-size: 1.2rem;
+      text-align: center;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 2s forwards;
+    }
+  </style>
+</head>
+<body>
+  <div class="loom-container">
+    <div class="loom-grid" id="loomGrid"></div>
+    <p class="ritual-text">Weaving your journey...</p>
+  </div>
+
+  <script>
+    const grid = document.getElementById('loomGrid');
+    for (let i = 0; i < 64; i++) {
+      const thread = document.createElement('div');
+      thread.className = 'loom-thread';
+      thread.style.setProperty('--i', i);
+      grid.appendChild(thread);
+    }
+  </script>
+</body>
+</html>

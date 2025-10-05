@@ -110,28 +110,35 @@
       top:20px;
       left:20px;
       z-index:9999;
-      width:48px;
-      height:48px;
+      width:52px;
+      height:52px;
       border-radius:50%;
-      background:rgba(255,255,255,0.15);
+      background:rgba(0,0,0,0.75);
       backdrop-filter:blur(10px);
-      border:1px solid rgba(255,255,255,0.25);
+      border:2px solid rgba(255,212,0,0.8);
       display:flex;
       align-items:center;
       justify-content:center;
       cursor:pointer;
       transition:all 0.3s ease;
-      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+      box-shadow:0 4px 16px rgba(0,0,0,0.5), 0 0 20px rgba(255,212,0,0.3);
+      animation:pulseGlow 2s infinite ease-in-out;
     }
     #backButton:hover{
-      background:rgba(255,255,255,0.25);
-      transform:scale(1.05);
+      background:rgba(0,0,0,0.9);
+      border-color:var(--secrets-yellow);
+      transform:scale(1.1);
+      box-shadow:0 6px 20px rgba(0,0,0,0.6), 0 0 30px rgba(255,212,0,0.5);
     }
     #backButton svg{
-      width:24px;
-      height:24px;
-      stroke:white;
+      width:26px;
+      height:26px;
+      stroke:var(--secrets-yellow);
       stroke-width:2.5;
+    }
+    @keyframes pulseGlow{
+      0%, 100%{box-shadow:0 4px 16px rgba(0,0,0,0.5), 0 0 20px rgba(255,212,0,0.3);}
+      50%{box-shadow:0 4px 16px rgba(0,0,0,0.5), 0 0 30px rgba(255,212,0,0.5);}
     }
 
     @media(max-width:768px){
@@ -286,12 +293,6 @@
     <img src="/tour-sufi-saints.jpeg" class="bg" alt="Sufi">
     <div class="overlay"><h2>Sufi Saints</h2><p class="note">🕯 Chants weave silence into devotion.</p></div>
     <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/sufi.mp4" type="video/mp4"></video></div>
-  </section>
-
-  <section class="scene">
-    <img src="/tour-voices-of-the-camps.jpeg" class="bg" alt="Camps">
-    <div class="overlay"><h2>Voices of the Camps</h2><p class="note">🏕 Every tent a library of loss and hope.</p></div>
-    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/camps.mp4" type="video/mp4"></video></div>
   </section>
 
   <section class="scene">
