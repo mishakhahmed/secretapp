@@ -3,248 +3,395 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secrets Cinematic Archive</title>
+  <title>Secrets – Shuffle Flip Cinematic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@600&family=Inter&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root{
+      --secrets-yellow:#FFD400;
+      --bg-dark:#000;
+      --bg-darker:#111;
+      --text-light:#fff;
+    }
+    html,body{margin:0;padding:0;background:var(--bg-dark);color:var(--text-light);font-family:"Playfair Display",serif;overflow-x:hidden;}
+
+    /* Fade overlay */
+    #fade{position:fixed;inset:0;background:#000;opacity:0;display:none;z-index:9999;transition:opacity .9s ease;}
+
+    /* Desk as stage for scattered cards */
+    #desk{
+      position:relative;
+      height:100vh;
+      background:var(--bg-darker);
+      overflow:hidden;
     }
 
-    body {
-      font-family: 'Playfair Display', Georgia, serif;
-      background: #000;
-      color: #fff;
-      overflow-x: hidden;
-      scroll-behavior: smooth;
+    /* Subtle hint button */
+    #discoverHint{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      font:600 14px/1 "Inter",sans-serif;
+      padding:10px 16px;background:rgba(0,0,0,0.5);
+      border:1px solid var(--secrets-yellow);
+      color:var(--secrets-yellow);
+      border-radius:8px;
+      letter-spacing:.3px;
+      animation:pulse 2.2s infinite ease-in-out;
+      z-index:5;
+      user-select:none;
+    }
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,212,0,0.25);}70%{box-shadow:0 0 0 12px rgba(255,212,0,0);}100%{box-shadow:0 0 0 0 rgba(255,212,0,0);}}
+
+    /* Card base */
+    .card{
+      position:absolute;
+      width:180px;height:260px;perspective:1000px;cursor:pointer;
+    }
+    .flipper{
+      position:relative;width:100%;height:100%;
+      transition:transform .6s ease;
+      transform-style:preserve-3d;
+    }
+    .card.flipped .flipper{transform:rotateY(180deg);}
+
+    .front,.back{
+      position:absolute;inset:0;border-radius:10px;border:2px solid var(--secrets-yellow);
+      backface-visibility:hidden;overflow:hidden;background:#1b1b1b;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 8px 20px rgba(0,0,0,0.45);
+    }
+    .front img,.back img{width:100%;height:100%;object-fit:cover;}
+    .back{transform:rotateY(180deg);}
+
+    /* Hover lift for desktop only */
+    @media(hover:hover){
+      .card:hover{z-index:6;}
     }
 
-    .scene {
-      min-height: 160vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem;
-      position: relative;
-      background-size: cover;
-      background-position: center;
-      opacity: 0;
-      transform: translateY(50px);
-      transition: opacity 0.8s ease, transform 0.8s ease;
+    /* Zoom-out before transition */
+    .card.zooming{transform:scale(1.6) rotate(3deg);transition:transform .8s ease;z-index:7;}
+
+    /* Fireflies optional ambiance */
+    #fireflies{pointer-events:none;}
+    .firefly{position:fixed;width:4px;height:4px;background:var(--secrets-yellow);border-radius:50%;
+      animation:flicker 3s infinite alternate, drift 26s infinite;opacity:.32;filter:blur(1px);}
+    @keyframes flicker{0%{opacity:.15;}100%{opacity:.75;}}
+    @keyframes drift{0%{transform:translate(0,0);}50%{transform:translate(70px,-90px);}100%{transform:translate(-70px,90px);}}
+
+    /* Archive scroll */
+    #archive{display:none;}
+    .scene{
+      height:160vh;display:flex;align-items:center;justify-content:center;flex-direction:column;
+      text-align:center;padding:40px;position:relative;opacity:0;transition:opacity 1.6s ease;overflow:hidden;
+      background:#000;color:#fff;
+    }
+    .scene.active{opacity:1;}
+    .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(60%);transform:scale(1.15);transition:transform 2s ease;}
+    .scene.active .bg{transform:scale(1.05);}
+    .overlay{position:relative;z-index:2;max-width:900px;padding:0 16px;}
+    .overlay h2{color:var(--secrets-yellow);font-size:2.6em;margin:0 0 18px 0;opacity:0;transform:translateY(20px);transition:all 1s ease;}
+    .scene.active .overlay h2{opacity:1;transform:translateY(0);}
+    .note{font-family:"Great Vibes",cursive;font-size:1.6em;opacity:0;transition:opacity 1.4s ease .5s;}
+    .scene.active .note{opacity:1;}
+
+    .video-box{width:90%;max-width:960px;margin:20px auto;padding-top:56.25%;position:relative;border:3px solid var(--secrets-yellow);border-radius:10px;overflow:hidden;box-shadow:0 0 20px rgba(0,0,0,0.6);z-index:2;opacity:0;transition:opacity 1.6s ease;}
+    .video-box video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+    .video-box::after{content:"mp4 placeholder";position:absolute;bottom:8px;right:12px;font:600 12px 'Inter',sans-serif;background:rgba(0,0,0,0.6);border:1px solid var(--secrets-yellow);padding:4px 8px;border-radius:6px;color:var(--secrets-yellow);}
+
+    .memory{height:120vh;display:flex;align-items:center;justify-content:center;background:#000;}
+    .gif-frame{width:min(85vw,820px);border:3px dashed var(--secrets-yellow);border-radius:12px;padding:8px;}
+    .gif-frame img{width:100%;height:auto;border-radius:8px;}
+
+    .mystery{position:absolute;bottom:30px;right:30px;font-size:2em;color:var(--secrets-yellow);cursor:pointer;
+      animation:float 4s infinite ease-in-out, pulse 2s infinite alternate;}
+    @keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-15px);}100%{transform:translateY(0);}}
+
+    /* Back button styles */
+    #backButton{
+      position:fixed;
+      top:20px;
+      left:20px;
+      z-index:9999;
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.15);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.25);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    }
+    #backButton:hover{
+      background:rgba(255,255,255,0.25);
+      transform:scale(1.05);
+    }
+    #backButton svg{
+      width:24px;
+      height:24px;
+      stroke:white;
+      stroke-width:2.5;
     }
 
-    .scene.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .scene.dark {
-      background-color: #000;
-    }
-
-    .scene.light {
-      background-color: #fff;
-      color: #000;
-    }
-
-    .scene::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to bottom right, rgba(0,0,0,0.4), transparent);
-      pointer-events: none;
-    }
-
-    .scene-title {
-      font-size: clamp(2rem, 8vw, 3.5rem);
-      font-weight: bold;
-      color: #FFD400;
-      margin-bottom: 1rem;
-      z-index: 1;
-      text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-    }
-
-    .scene.light .scene-title {
-      color: #000;
-      text-shadow: none;
-    }
-
-    .scene-note {
-      font-size: clamp(1rem, 4vw, 1.25rem);
-      max-width: 600px;
-      margin: 0.5rem auto;
-      line-height: 1.6;
-      z-index: 1;
-      opacity: 0;
-      transform: translateX(-30px);
-      transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
-    }
-
-    .scene.active .scene-note:nth-of-type(1) {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .scene.active .scene-note:nth-of-type(2) {
-      opacity: 1;
-      transform: translateX(0);
-      transition-delay: 0.5s;
-    }
-
-    .scene.light .scene-note {
-      color: #333;
-    }
-
-    .scene-label {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      font-weight: 300;
-      z-index: 1;
-      opacity: 0.7;
-    }
-
-    .scene.light .scene-label {
-      color: #666;
-    }
-
-    .mystery-icon {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 20vw;
-      font-weight: bold;
-      opacity: 0.1;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    @media (max-width: 768px) {
-      .scene {
-        min-height: 140vh;
-        padding: 1.5rem;
-      }
-
-      .scene-note {
-        font-size: 1rem;
-      }
+    @media(max-width:768px){
+      .overlay h2{font-size:1.9em;}
+      .note{font-size:1.25em;}
+      .scene{height:140vh;}
+      .memory{height:100vh;}
     }
   </style>
 </head>
 <body>
 
-  <!-- Scene 1: Jamdani -->
-  <div class="scene dark" style="background-image: url('/tour-jamdani-loom-1.jpeg');">
-    <h2 class="scene-title">Jamdani Secrets</h2>
-    <p class="scene-note">🧵 Threads carry time in silence.</p>
-    <p class="scene-note">Every weave is a whisper from Bengal's past.</p>
-    <div class="scene-label">Jamdani</div>
+<div id="fade"></div>
+
+<button id="backButton" title="Back to Experiences">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+  </svg>
+</button>
+
+<section id="desk" aria-label="Shuffle Cards Stage">
+  <div id="discoverHint">Discover the secret</div>
+
+   12 cards with front and back images 
+  <div class="card" data-name="gamejamdani">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gamejamdani.jpg" alt="gamejamdani"></div>
+      <div class="back"><img src="/assets/gamejamdaniside2.jpg" alt="gamejamdaniside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 2: Fisherman -->
-  <div class="scene light" style="background-image: url('/tour-fishermens-secret-1.jpeg');">
-    <h2 class="scene-title">The Fisherman's Secret</h2>
-    <p class="scene-note">🌊 The river awakens before the city.</p>
-    <p class="scene-note">Boats drift like memories across dawn's water.</p>
-    <div class="scene-label">Fisherman</div>
+  <div class="card" data-name="gamepanam">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gamepanam.jpg" alt="gamepanam"></div>
+      <div class="back"><img src="/assets/gamepanamside2.jpg" alt="gamepanamside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 3: Panam -->
-  <div class="scene dark" style="background-image: url('/tour-panam-sonargaon.jpeg');">
-    <h2 class="scene-title">Panam Nagar</h2>
-    <p class="scene-note">🏚 Lantern-lit alleys whisper merchant legacies.</p>
-    <p class="scene-note">Crumbling walls breathe forgotten trade stories.</p>
-    <div class="scene-label">Panam</div>
+  <div class="card" data-name="gamefish">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gamefish.jpg" alt="gamefish"></div>
+      <div class="back"><img src="/assets/gamefishside2.jpg" alt="gamefishside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 4: Old Dhaka -->
-  <div class="scene light" style="background-image: url('/tour-old-dhaka.jpeg');">
-    <h2 class="scene-title">Echoes of Old Dhaka</h2>
-    <p class="scene-note">🌶 A spice market whispers even when empty.</p>
-    <p class="scene-note">The scent of cardamom is memory itself.</p>
-    <div class="scene-label">Old Dhaka</div>
+  <div class="card" data-name="gameold">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gameold.jpg" alt="gameold"></div>
+      <div class="back"><img src="/assets/gameoldside2.jpg" alt="gameoldside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 5: Culinary -->
-  <div class="scene dark" style="background-image: url('/tour-culinary-pilgrimage.jpeg');">
-    <h2 class="scene-title">Culinary Pilgrimage</h2>
-    <p class="scene-note">🍲 Kitchens keep memory alive with every flame.</p>
-    <p class="scene-note">Taste is the archive of the tongue.</p>
-    <div class="scene-label">Culinary</div>
+  <div class="card" data-name="gameculinary">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gameculinary.jpg" alt="gameculinary"></div>
+      <div class="back"><img src="/assets/gameculinaryside2.jpg" alt="gameculinaryside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 6: Sufi -->
-  <div class="scene light" style="background-image: url('/tour-sufi-saints.jpeg');">
-    <h2 class="scene-title">Sufi Saints</h2>
-    <p class="scene-note">🕌 Chants weave silence into devotion.</p>
-    <p class="scene-note">Echoes of zikr ripple through eternity.</p>
-    <div class="scene-label">Sufi</div>
+  <div class="card" data-name="gamemystic">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gamemystic.jpg" alt="gamemystic"></div>
+      <div class="back"><img src="/assets/gamemysticside2.jpg" alt="gamemysticside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 7: Camps -->
-  <div class="scene dark" style="background-image: url('/tour-voices-of-the-camps.jpeg');">
-    <h2 class="scene-title">Voices of the Camps</h2>
-    <p class="scene-note">🏕 Whispers carry stories of survival.</p>
-    <p class="scene-note">Every tent is a library of loss and hope.</p>
-    <div class="scene-label">Camps</div>
-    <div class="mystery-icon">?</div>
+  <div class="card" data-name="gameart">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gameart.jpg" alt="gameart"></div>
+      <div class="back"><img src="/assets/gameartside2.jpg" alt="gameartside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 8: Memory Scape I -->
-  <div class="scene light">
-    <h2 class="scene-title">Memory Scape I</h2>
-    <p class="scene-note">✨ Stitched notes of forgotten times.</p>
-    <p class="scene-note">Fragments rearrange as if alive.</p>
-    <div class="scene-label">Memory I</div>
+  <div class="card" data-name="gameriver">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gameriver.jpg" alt="gameriver"></div>
+      <div class="back"><img src="/assets/gameriverside2.jpg" alt="gameriverside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 9: Memory Scape II -->
-  <div class="scene dark">
-    <h2 class="scene-title">Memory Scape II</h2>
-    <p class="scene-note">✍️ Letters drift, fall, then reform.</p>
-    <p class="scene-note">The archive itself is breathing.</p>
-    <div class="scene-label">Memory II</div>
+  <div class="card" data-name="gamepoet">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gamepoet.jpg" alt="gamepoet"></div>
+      <div class="back"><img src="/assets/gamepoetside2.jpg" alt="gamepoetside2"></div>
+    </div>
   </div>
 
-  <!-- Scene 10: Memory Scape III -->
-  <div class="scene light">
-    <h2 class="scene-title">Memory Scape III</h2>
-    <p class="scene-note">❓ A mystery remains unsolved.</p>
-    <p class="scene-note">Some secrets are not meant to be found.</p>
-    <div class="scene-label">Memory III</div>
-    <div class="mystery-icon">?</div>
+  <div class="card" data-name="gameheritage">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gameheritage.jpg" alt="gameheritage"></div>
+      <div class="back"><img src="/assets/gameheritageside2.jpg" alt="gameheritageside2"></div>
+    </div>
   </div>
 
-  <script>
-    // Intersection Observer for scene activation
-    const scenes = document.querySelectorAll('.scene');
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        }
-      });
-    }, {
-      threshold: 0.5
+  <div class="card" data-name="gamenumber8">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gamenumber8.jpg" alt="gamenumber8"></div>
+      <div class="back"><img src="/assets/gamenumber8side2.jpg" alt="gamenumber8side2"></div>
+    </div>
+  </div>
+
+  <div class="card" data-name="gamenumber9">
+    <div class="flipper">
+      <div class="front"><img src="/assets/gamenumber9.jpg" alt="gamenumber9"></div>
+      <div class="back"><img src="/assets/gamenumber9side2.jpg" alt="gamenumber9side2"></div>
+    </div>
+  </div>
+</section>
+
+ Ambient fireflies 
+<div id="fireflies"></div>
+
+<main id="archive">
+  <section class="scene">
+    <img src="/tour-jamdani-loom-1.jpeg" class="bg" alt="Jamdani">
+    <div class="overlay"><h2>Jamdani Secrets</h2><p class="note">🧵 Threads carry time in silence.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/jamdani.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section class="memory"><div class="gif-frame"><img src="/assets/memory1.gif" alt="memory1"></div></section>
+
+  <section class="scene">
+    <img src="/tour-fishermens-secret-1.jpeg" class="bg" alt="Fisherman">
+    <div class="overlay"><h2>The Fisherman's Secret</h2><p class="note">🌊 The river awakens before the city.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/fisherman.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section class="memory"><div class="gif-frame"><img src="/assets/memory2.gif" alt="memory2"></div></section>
+
+  <section class="scene">
+    <img src="/tour-panam-sonargaon.jpeg" class="bg" alt="Panam">
+    <div class="overlay"><h2>Panam Nagar</h2><p class="note">🏚 Lantern-lit alleys remember merchants.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/sonargaon.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section class="memory"><div class="gif-frame"><img src="/assets/memory3.gif" alt="memory3"></div></section>
+
+  <section class="scene">
+    <img src="/tour-old-dhaka.jpeg" class="bg" alt="Old Dhaka">
+    <div class="overlay"><h2>Old Dhaka — Pink Palace</h2><p class="note">🏛 The palace watches the Buriganga.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/old-dhaka.mp4" type="video/mp4"></video></div>
+    <div class="mystery">?</div>
+  </section>
+
+  <section class="scene">
+    <img src="/tour-culinary-pilgrimage.jpeg" class="bg" alt="Culinary">
+    <div class="overlay"><h2>Culinary Pilgrimage</h2><p class="note">🍲 Kitchens keep memory alive with every flame.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/culinary.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section class="scene">
+    <img src="/tour-sufi-saints.jpeg" class="bg" alt="Sufi">
+    <div class="overlay"><h2>Sufi Saints</h2><p class="note">🕯 Chants weave silence into devotion.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/sufi.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section class="scene">
+    <img src="/tour-voices-of-the-camps.jpeg" class="bg" alt="Camps">
+    <div class="overlay"><h2>Voices of the Camps</h2><p class="note">🏕 Every tent a library of loss and hope.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/camps.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section class="scene">
+    <img src="/assets/meghna.jpg" class="bg" alt="Meghna">
+    <div class="overlay"><h2>Meghna River Journeys</h2><p class="note">🚤 The river carries voices beyond time.</p></div>
+    <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/meghna.mp4" type="video/mp4"></video></div>
+  </section>
+</main>
+
+<script>
+  /* Fireflies */
+  const fireflyContainer=document.getElementById('fireflies');
+  for(let i=0;i<24;i++){
+    const f=document.createElement('div');
+    f.className='firefly';
+    f.style.top=Math.random()*100+'%';
+    f.style.left=Math.random()*100+'%';
+    f.style.animationDuration=(2+Math.random()*2)+'s, '+(18+Math.random()*14)+'s';
+    fireflyContainer.appendChild(f);
+  }
+
+  const desk=document.getElementById('desk');
+  const fade=document.getElementById('fade');
+  const archive=document.getElementById('archive');
+  const cards=[...document.querySelectorAll('.card')];
+
+  /* scatter cards in random positions and small rotations */
+  function scatter(){
+    const pad=40; // padding from edges
+    const W=desk.clientWidth;
+    const H=desk.clientHeight;
+    cards.forEach((card,idx)=>{
+      const w=card.offsetWidth;
+      const h=card.offsetHeight;
+      const left=Math.max(pad, Math.min(W-w-pad, Math.random()*(W-w)));
+      const top=Math.max(pad, Math.min(H-h-pad, Math.random()*(H-h)));
+      const rot=(Math.random()*12-6).toFixed(2); // -6 to 6 deg
+      card.style.transform=`translate(${left}px, ${top}px) rotate(${rot}deg)`;
     });
+  }
+  window.addEventListener('load', scatter);
+  window.addEventListener('resize', ()=>{ setTimeout(scatter, 200); });
 
-    scenes.forEach(scene => {
-      observer.observe(scene);
-    });
+  /* click-to-flip then second click to enter cinematic */
+  cards.forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const flipped=card.classList.contains('flipped');
+      if(!flipped){
+        card.classList.add('flipped');
+      }else{
+        // second click → zoom then transition
+        card.classList.add('zooming');
+        setTimeout(()=>{
+          fade.style.display='block'; requestAnimationFrame(()=>{ fade.style.opacity='1'; });
+          setTimeout(()=>{
+            desk.style.display='none';
+            archive.style.display='block';
+            window.scrollTo(0,0);
+            fade.style.opacity='0';
+            setTimeout(()=>{ fade.style.display='none'; }, 800);
+          }, 800);
+        }, 600);
+      }
+    }, false);
+  });
 
-    // Activate first scene immediately
-    if (scenes.length > 0) {
-      scenes[0].classList.add('active');
+  /* Intersection Observer for archive scenes */
+  const scenes=document.querySelectorAll('.scene');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('active'); } });
+  },{threshold:0.4});
+  scenes.forEach(s=>obs.observe(s));
+
+  /* Mystery link */
+  document.addEventListener('click', e=>{
+    if(e.target.classList.contains('mystery')){ window.location.href='https://secretsbangladesh.com/stories'; }
+  });
+
+/* Hide Discover Hint after two shuffles */
+let shuffleCount = 0;
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+    shuffleCount++;
+    if (shuffleCount >= 2) {
+      const hint = document.getElementById('discoverHint');
+      if (hint) {
+        hint.style.transition = 'opacity 0.6s ease';
+        hint.style.opacity = '0';
+        setTimeout(() => hint.remove(), 600);
+      }
     }
-  </script>
+  }, { once: false });
+});
 
+  /* Back button functionality */
+  document.getElementById('backButton').addEventListener('click', ()=>{
+    // Send message to parent window to navigate back
+    window.parent.postMessage({ type: 'CINEMATIC_BACK' }, '*');
+  });
+
+</script>
 </body>
 </html>

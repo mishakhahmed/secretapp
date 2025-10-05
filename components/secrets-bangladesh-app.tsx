@@ -1860,6 +1860,18 @@ export default function SecretsBangladeshApp() {
     setShowSiteMap(params.get("debug") === "1")
   }, [])
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === "CINEMATIC_BACK") {
+        setRoute("experiences")
+        setBottom("experiences")
+      }
+    }
+
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
+
   const openDetail = (exp: any) => {
     setDetail(exp)
     setRoute("detail")
