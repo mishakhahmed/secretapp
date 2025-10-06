@@ -12,6 +12,14 @@ export default function LoomPage() {
   useEffect(() => {
     const storedMood = localStorage.getItem("secrets_mood")
     console.log("[v0] Loom page loaded, mood from localStorage:", storedMood)
+
+    if (storedMood === "inspired") {
+      console.log("[v0] Inspired mood detected - redirecting to main app")
+      localStorage.removeItem("secrets_mood")
+      router.replace("/")
+      return
+    }
+
     setMood(storedMood)
 
     if (!storedMood) {

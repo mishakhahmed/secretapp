@@ -17,10 +17,22 @@ export default function InspirePage() {
   const handleMoodSelect = (mood: string) => {
     console.log("[v0] Mood selected:", mood)
     setSelectedMood(mood)
+
+    if (mood === "inspired") {
+      console.log("[v0] Inspired mood - redirecting to inspired archive")
+      localStorage.removeItem("secrets_mood")
+      const returnUrl = encodeURIComponent(window.location.origin)
+      window.location.href = `https://v0-inspired-archive.vercel.app/?ref=${returnUrl}`
+      return
+    }
+
+    // For other moods, save to localStorage and redirect to loom
+    console.log("[v0] Non-inspired mood - saving to localStorage and redirecting to loom")
     localStorage.setItem("secrets_mood", mood)
-    console.log("[v0] Mood saved to localStorage, redirecting to /loom in 800ms")
+    console.log("[v0] Mood saved to localStorage:", localStorage.getItem("secrets_mood"))
 
     setTimeout(() => {
+      console.log("[v0] Redirecting to loom for mood:", mood)
       router.push("/loom")
     }, 800)
   }
@@ -33,7 +45,7 @@ export default function InspirePage() {
   const moods = [
     { id: "adventurous", label: "Adventurous", color: "from-orange-500 to-red-500" },
     { id: "curious", label: "Curious", color: "from-blue-500 to-purple-500" },
-    { id: "inspire", label: "Inspire Me", color: "from-yellow-500 to-orange-500" },
+    { id: "inspired", label: "Inspire Me", color: "from-yellow-500 to-orange-500" },
     { id: "reconnected", label: "Reconnected", color: "from-green-500 to-teal-500" },
   ]
 

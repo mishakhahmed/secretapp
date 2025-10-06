@@ -1,6 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Suspense } from "react"
+import { CrossDomainNav } from "@/components/CrossDomainNav"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans">
+        <CrossDomainNav />
         <Suspense fallback={null}>{children}</Suspense>
       </body>
     </html>
