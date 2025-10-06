@@ -29,6 +29,8 @@ import { ExpandableText } from "@/components/ExpandableText"
 import { Itinerary } from "@/components/Itinerary"
 import dynamic from "next/dynamic"
 
+import { Loom } from "./Loom"
+
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { ssr: false })
 
 /*************************************************
@@ -257,7 +259,7 @@ function MoodCard({ mood, onSelect }: any) {
 
 /* ===================== INSPIRE (Full Mood Pathways) ===================== */
 function Inspire({ onPickMood, goExperiences, imgs }: any) {
-  const [step, setStep] = useState<"seal" | "mood" | "pathway">("seal")
+  const [step, setStep] = useState<"seal" | "mood" | "loom" | "pathway">("seal")
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
   const [isRevealed, setIsRevealed] = useState(false)
   const [hoverStartTime, setHoverStartTime] = useState<number | null>(null)
@@ -265,7 +267,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   const [weaveTiles, setWeaveTiles] = useState<string[]>([])
   const [memoryBasket, setMemoryBasket] = useState<string[]>([])
 
-  const moods = ["Adventurous", "Curious", "Inspire Me", "Reconnected"]
+  const moods = ["Adventurous", "Curious", "Inspired", "Reconnected"]
 
   const trackEvent = (action: string, label: string, value?: any) => {
     console.log("[v0] Tracking Event:", action, label, value)
@@ -274,8 +276,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
 
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood)
-    setTimeout(() => setStep("pathway"), 800)
-    trackEvent("Mood Selected", mood)
+    setStep("loom")
   }
 
   const handleSealHoverStart = () => {
@@ -324,6 +325,10 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
       setMemoryBasket([...memoryBasket, memory])
       trackEvent("Memory Added", memory)
     }
+  }
+
+  const handleLoomComplete = () => {
+    setStep("pathway")
   }
 
   const CinematicScene = ({
@@ -439,6 +444,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                 {moods.map((mood) => (
                   <button
                     key={mood}
+                    data-mood={mood.toLowerCase()}
                     onClick={() => handleMoodSelect(mood)}
                     className="px-6 py-4 rounded-xl border-2 border-[#FFD400] text-[#FFD400] hover:bg-[#FFD400] hover:text-black transition-all min-h-[44px] font-medium"
                   >
@@ -446,6 +452,19 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                   </button>
                 ))}
               </div>
+            </motion.div>
+          )}
+
+          {step === "loom" && selectedMood && (
+            <motion.div
+              key="loom"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="fixed inset-0 z-50"
+            >
+              <Loom mood={selectedMood.toLowerCase()} onComplete={handleLoomComplete} />
             </motion.div>
           )}
 
@@ -457,7 +476,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
               transition={{ duration: 0.6 }}
               className="flex-1 overflow-y-auto px-4 pt-8 pb-28"
             >
-              {selectedMood === "Inspire Me" && (
+              {selectedMood === "Inspired" && (
                 <div className="fixed inset-0 z-50 bg-black">
                   <iframe
                     src="/cinematic/index.html"
@@ -617,7 +636,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                 </motion.div>
               )}
 
-              {selectedMood === "Inspire Me" && (
+              {selectedMood === "Inspired" && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -1858,6 +1877,22 @@ export default function SecretsBangladeshApp() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     setShowSiteMap(params.get("debug") === "1")
+  }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const moodParam = params.get("mood")
+    if (moodParam) {
+      setRoute("inspire")
+      setBottom("inspire")
+      // Trigger the mood pathway display
+      setTimeout(() => {
+        const moodButton = document.querySelector(`[data-mood="${moodParam}"]`)
+        if (moodButton) {
+          ;(moodButton as HTMLButtonElement).click()
+        }
+      }, 100)
+    }
   }, [])
 
   useEffect(() => {

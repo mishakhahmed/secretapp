@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secrets of Bangladesh - Cinematic Journey</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Georgia', serif;
+      background: #000;
+      color: #FFD400;
+      overflow-x: hidden;
+    }
+
+    .scene {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .scene::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      color: #FFD400;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    p {
+      font-size: 1.5rem;
+      line-height: 1.8;
+      color: #fff;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Updated back button to match other cinematics with circular design and pulse animation */
+    #backButton {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 9999;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      border: 2px solid #FFD400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(255, 212, 0, 0.3);
+      animation: pulseGlow 2s infinite alternate;
+    }
+    
+    #backButton:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 212, 0, 0.6);
+    }
+    
+    #backButton svg {
+      width: 24px;
+      height: 24px;
+      fill: #FFD400;
+    }
+    
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 20px rgba(255, 212, 0, 0.3); }
+      100% { box-shadow: 0 0 35px rgba(255, 212, 0, 0.5); }
+    }
+  </style>
+</head>
+<body>
+   Replaced simple button with circular SVG back button 
+  <button id="backButton" aria-label="Go back">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+    </svg>
+  </button>
+
+  <div class="scene" style="background-image: url('/hero-image-2.jpg');">
+    <div class="content">
+      <h1>Welcome to the Secrets</h1>
+      <p>Every city keeps its secrets. Bangladesh whispers stories of ancient traditions, hidden corners, and untold mysteries.</p>
+    </div>
+  </div>
+
+  <div class="scene" style="background-image: url('/hero-image-3.jpg');">
+    <div class="content">
+      <h1>The Journey Begins</h1>
+      <p>From the bustling streets of Dhaka to the serene rivers of the delta, discover the hidden gems that make Bangladesh extraordinary.</p>
+    </div>
+  </div>
+
+  <div class="scene" style="background-image: url('/tour-fishermens-secret-1.jpeg');">
+    <div class="content">
+      <h1>Stories Untold</h1>
+      <p>Each secret reveals a piece of the soul of this land. Let curiosity be your guide as you explore the unknown.</p>
+    </div>
+  </div>
+
+  <script>
+    console.log("[v0] Cinematic scroll loaded");
+
+    document.getElementById('backButton').addEventListener('click', () => {
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

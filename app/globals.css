@@ -133,6 +133,20 @@
     scrollbar-width: none;
   }
 
+  /* Added loom-bg styles for YouTube background video */
+  .loom-bg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   /* Enhanced smooth scroll behavior for all sections with mobile optimization */
   .scroll-smooth {
     scroll-behavior: smooth;
