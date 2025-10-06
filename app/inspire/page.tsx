@@ -1,179 +1,128 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
-export default function InspirePage() {
-  const router = useRouter()
-  const [showMoodSelector, setShowMoodSelector] = useState(false)
-  const [selectedMood, setSelectedMood] = useState<string | null>(null)
+type Step = "seal" | "mood" | "loom" | "ritual"
+type Mood = "adventurous" | "curious" | "reconnected" | "inspire"
 
-  const handleSealClick = () => {
-    console.log("[v0] Seal clicked, showing mood selector")
-    setShowMoodSelector(true)
-  }
+function InspirePageContent() {
+  const [step, setStep] = useState<Step>("seal")
+  const [selectedMood, setSelectedMood] = useState<Mood | null>(null)
 
-  const handleMoodSelect = (mood: string) => {
-    console.log("[v0] Mood selected:", mood)
-    setSelectedMood(mood)
-
-    if (mood === "inspired") {
-      console.log("[v0] Inspired mood - redirecting to inspired archive")
-      localStorage.removeItem("secrets_mood")
-      const returnUrl = encodeURIComponent(window.location.origin)
-      window.location.href = `https://v0-inspired-archive.vercel.app/?ref=${returnUrl}`
-      return
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === "RITUAL_BACK") {
+        setStep("mood")
+        setSelectedMood(null)
+      }
     }
-
-    // For other moods, save to localStorage and redirect to loom
-    console.log("[v0] Non-inspired mood - saving to localStorage and redirecting to loom")
-    localStorage.setItem("secrets_mood", mood)
-    console.log("[v0] Mood saved to localStorage:", localStorage.getItem("secrets_mood"))
-
-    setTimeout(() => {
-      console.log("[v0] Redirecting to loom for mood:", mood)
-      router.push("/loom")
-    }, 800)
-  }
-
-  const handleBack = () => {
-    console.log("[v0] Back button clicked, returning to main app")
-    router.push("/")
-  }
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [])
 
   const moods = [
-    { id: "adventurous", label: "Adventurous", color: "from-orange-500 to-red-500" },
-    { id: "curious", label: "Curious", color: "from-blue-500 to-purple-500" },
-    { id: "inspired", label: "Inspire Me", color: "from-yellow-500 to-orange-500" },
-    { id: "reconnected", label: "Reconnected", color: "from-green-500 to-teal-500" },
+    { id: "adventurous" as Mood, label: "Adventurous", color: "#FF6B35" },
+    { id: "curious" as Mood, label: "Curious", color: "#4ECDC4" },
+    { id: "reconnected" as Mood, label: "Reconnected", color: "#95E1D3" },
+    { id: "inspire" as Mood, label: "Inspire Me", color: "#FFD400" },
   ]
 
+  const handleMoodSelect = (mood: Mood) => {
+    setSelectedMood(mood)
+    setStep("loom")
+    setTimeout(() => {
+      setStep("ritual")
+    }, 3000)
+  }
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/rDYdeq3JW_E?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&playlist=rDYdeq3JW_E&start=4"
-        className="loom-bg absolute inset-0 w-full h-full object-cover pointer-events-none opacity-30"
-        allow="autoplay; loop; fullscreen"
-      />
-
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/70 z-0" />
-
-      {showMoodSelector && (
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4 }}
-          onClick={handleBack}
-          className="fixed top-6 left-6 z-50 w-12 h-12 rounded-full bg-black/60 backdrop-blur-sm border-2 border-[#FFD400]/60 flex items-center justify-center hover:bg-black/80 hover:border-[#FFD400] transition-all duration-300 hover:scale-110"
-          style={{
-            boxShadow: "0 0 20px rgba(255, 212, 0, 0.3)",
-            animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2.5}
-            stroke="#FFD400"
-            className="w-6 h-6"
+    <div className="fixed inset-0 bg-[#1a1410] overflow-hidden">
+      <AnimatePresence mode="wait">
+        {step === "seal" && (
+          <motion.div
+            key="seal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex flex-col items-center justify-center"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-          </svg>
-        </motion.button>
-      )}
-
-      {/* Content */}
-      <div className="relative z-10 w-full">
-        <AnimatePresence mode="wait">
-          {!showMoodSelector ? (
-            <motion.div
-              key="wax-seal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col items-center justify-center gap-6"
+            <img src="/assets/Secrets-wax-seal.png" alt="Secrets Wax Seal" className="w-48 h-48 mb-8 animate-pulse" />
+            <p className="text-white/60 text-lg mb-8 text-center px-4 font-serif italic">
+              Every city keeps its secrets.
+              <br />
+              Break the seal to discover yours.
+            </p>
+            <button
+              onClick={() => setStep("mood")}
+              className="px-8 py-3 bg-[#FFD400] text-[#1a1410] rounded-full font-semibold hover:bg-[#FFE44D] transition-colors"
             >
-              <motion.div
-                animate={{
-                  scale: [1, 1.05, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-                onClick={handleSealClick}
-                className="w-40 h-40 md:w-48 md:h-48 rounded-full bg-[#8B0000] border-4 border-[#8B0000]/60 shadow-2xl flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
-              >
-                <div className="text-center">
-                  <div className="text-5xl md:text-6xl text-[#FFD400]/90 font-serif font-bold">S</div>
-                  <div className="text-xs text-[#FFD400]/70 tracking-widest">SECRETS</div>
-                </div>
-              </motion.div>
+              Break the Wax Seal
+            </button>
+          </motion.div>
+        )}
 
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-[#FFD400]/80 text-lg md:text-xl font-serif italic"
-              >
-                Every city keeps its secrets.
-              </motion.p>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="mood-selector"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="flex flex-col items-center justify-center gap-8 px-4"
-            >
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="font-serif text-2xl md:text-3xl text-[#FFD400] text-center"
-              >
-                How do you wish to explore?
-              </motion.h2>
+        {step === "mood" && (
+          <motion.div
+            key="mood"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="absolute inset-0 flex flex-col items-center justify-center p-8"
+          >
+            <h2 className="text-3xl font-serif text-white mb-12 text-center">How do you feel today?</h2>
+            <div className="grid grid-cols-2 gap-6 max-w-2xl w-full">
+              {moods.map((mood) => (
+                <button
+                  key={mood.id}
+                  onClick={() => handleMoodSelect(mood.id)}
+                  className="p-8 rounded-2xl border-2 border-white/20 hover:border-white/40 transition-all hover:scale-105"
+                  style={{ backgroundColor: `${mood.color}15` }}
+                >
+                  <div className="w-16 h-16 rounded-full mx-auto mb-4" style={{ backgroundColor: mood.color }} />
+                  <p className="text-white text-xl font-semibold">{mood.label}</p>
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
-              <div className="grid grid-cols-2 gap-6 md:gap-8 max-w-2xl">
-                {moods.map((mood, index) => (
-                  <motion.button
-                    key={mood.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: index * 0.1 }}
-                    onClick={() => handleMoodSelect(mood.id)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`relative w-32 h-32 md:w-40 md:h-40 rounded-full border-4 transition-all duration-300 flex items-center justify-center ${
-                      selectedMood === mood.id
-                        ? "border-[#FFD400] bg-[#FFD400]/20 shadow-xl shadow-[#FFD400]/30"
-                        : "border-[#FFD400]/50 bg-black/40 hover:border-[#FFD400] hover:bg-black/60"
-                    }`}
-                  >
-                    <span className="text-[#FFD400] font-serif text-base md:text-lg text-center px-4">
-                      {mood.label}
-                    </span>
+        {step === "loom" && selectedMood && (
+          <motion.div
+            key="loom"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0"
+          >
+            <iframe src="/shared/loom/index.html" className="w-full h-full border-0" title="Jamdani Loom Ritual" />
+          </motion.div>
+        )}
 
-                    {selectedMood === mood.id && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute inset-0 rounded-full border-4 border-[#FFD400] animate-pulse"
-                      />
-                    )}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+        {step === "ritual" && selectedMood && (
+          <motion.div
+            key="ritual"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0"
+          >
+            <iframe
+              src={`/rituals/${selectedMood}/index.html`}
+              className="w-full h-full border-0"
+              title={`${selectedMood} ritual`}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  )
+}
+
+export default function InspirePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#1a1410]" />}>
+      <InspirePageContent />
+    </Suspense>
   )
 }

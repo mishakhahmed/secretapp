@@ -135,17 +135,11 @@ export function FreeformLoom({ onComplete }: FreeformLoomProps) {
 
   return (
     <div className="fixed inset-0 bg-[#1a1410] overflow-hidden">
-      <iframe
-        src="https://www.youtube-nocookie.com/embed/rDYdeq3JW_E?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&playlist=rDYdeq3JW_E&start=4"
-        className="loom-bg absolute inset-0 w-full h-full object-cover pointer-events-none opacity-20"
-        allow="autoplay; loop; fullscreen"
-      />
-
       <canvas
         ref={canvasRef}
         onTouchStart={handleTouch}
         onClick={handleTouch}
-        className="absolute inset-0 cursor-crosshair touch-none z-10"
+        className="absolute inset-0 cursor-crosshair touch-none"
       />
 
       {/* Instructions */}

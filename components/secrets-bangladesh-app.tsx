@@ -275,20 +275,6 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   }
 
   const handleMoodSelect = (mood: string) => {
-    if (mood === "Inspired") {
-      console.log("[v0] Inspired mood selected - redirecting to inspired archive")
-      // Clear any stored mood and redirect to inspired archive
-      localStorage.removeItem("secrets_mood")
-      // Reset to seal state to allow re-entry
-      setStep("seal")
-      setSelectedMood(null)
-      const returnUrl = encodeURIComponent(window.location.origin)
-      window.location.href = `https://v0-inspired-archive.vercel.app/?ref=${returnUrl}`
-      return
-    }
-
-    // For other moods, proceed with loom
-    console.log("[v0] Mood selected for loom:", mood)
     setSelectedMood(mood)
     setStep("loom")
   }

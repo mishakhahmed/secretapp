@@ -1,49 +1,35 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
-import { FreeformLoom } from "@/components/FreeformLoom"
+import { Loom } from "@/components/Loom"
 
-export default function LoomPage() {
+function LoomPageContent() {
   const router = useRouter()
   const [mood, setMood] = useState<string | null>(null)
 
   useEffect(() => {
     const storedMood = localStorage.getItem("secrets_mood")
-    console.log("[v0] Loom page loaded, mood from localStorage:", storedMood)
-
-    if (storedMood === "inspired") {
-      console.log("[v0] Inspired mood detected - redirecting to main app")
-      localStorage.removeItem("secrets_mood")
-      router.replace("/")
-      return
-    }
-
     setMood(storedMood)
 
     if (!storedMood) {
-      console.log("[v0] No mood found, redirecting to inspire")
-      router.push("/inspire")
+      router.push("/")
     }
   }, [router])
 
   const handleLoomComplete = () => {
-    console.log("[v0] Loom complete! Mood:", mood)
-
     if (mood) {
-      console.log(`[v0] Redirecting to /${mood}`)
-      router.push(`/${mood}`)
+      router.push(`/?mood=${mood}`)
     } else {
-      console.log("[v0] No mood found, redirecting to archive")
-      router.push("/archive")
+      router.push("/")
     }
   }
 
   if (!mood) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-golden text-xl font-playfair">
+      <div className="min-h-screen flex items-center justify-center bg-[#1a1410]">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-[#FFD400] text-xl font-serif">
           Loading...
         </motion.div>
       </div>
@@ -52,7 +38,15 @@ export default function LoomPage() {
 
   return (
     <div className="relative min-h-screen">
-      <FreeformLoom onComplete={handleLoomComplete} />
+      <Loom mood={mood} onComplete={handleLoomComplete} />
     </div>
+  )
+}
+
+export default function LoomPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#1a1410]" />}>
+      <LoomPageContent />
+    </Suspense>
   )
 }
