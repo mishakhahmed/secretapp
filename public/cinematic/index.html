@@ -137,8 +137,8 @@
       stroke-width:2.5;
     }
     @keyframes pulseGlow{
-      0%, 100%{box-shadow:0 4px 16px rgba(0,0,0,0.5), 0 0 20px rgba(255,212,0,0.3);}
-      50%{box-shadow:0 4px 16px rgba(0,0,0,0.5), 0 0 30px rgba(255,212,0,0.5);}
+      0%, 100%{box-shadow:0 4px 16px rgba(0,0,0,0.5), 0 0 20px rgba(255, 212, 0, 0.3);}
+      50%{box-shadow:0 4px 16px rgba(0,0,0,0.5), 0 0 30px rgba(255, 212, 0, 0.5);}
     }
 
     @media(max-width:768px){
@@ -300,6 +300,29 @@
     <div class="overlay"><h2>Meghna River Journeys</h2><p class="note">🚤 The river carries voices beyond time.</p></div>
     <div class="video-box"><video autoplay muted loop playsinline><source src="/assets/meghna.mp4" type="video/mp4"></video></div>
   </section>
+
+  <section class="scene" style="height: 100vh;">
+    <div class="overlay">
+      <h2 style="margin-bottom: 30px;">Your Journey Continues...</h2>
+      <p class="note" style="margin-bottom: 40px;">Discover more secrets waiting to be unveiled</p>
+      <button id="continueButton" style="
+        font-family: 'Inter', sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        padding: 16px 40px;
+        background: var(--secrets-yellow);
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(255, 212, 0, 0.3);
+        letter-spacing: 0.5px;
+      " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(255, 212, 0, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 16px rgba(255, 212, 0, 0.3)';">
+        Continue to Experiences
+      </button>
+    </div>
+  </section>
 </main>
 
 <script>
@@ -391,6 +414,12 @@ cards.forEach(card => {
   document.getElementById('backButton').addEventListener('click', ()=>{
     // Send message to parent window to navigate back
     window.parent.postMessage({ type: 'CINEMATIC_BACK' }, '*');
+  });
+
+  /* Continue button functionality */
+  document.getElementById('continueButton').addEventListener('click', ()=>{
+    // Send message to parent window to complete cinematic and go to experiences
+    window.parent.postMessage({ type: 'CINEMATIC_COMPLETE' }, '*');
   });
 
 </script>

@@ -274,6 +274,19 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
     // TODO: Integrate with analytics service later
   }
 
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === "CINEMATIC_BACK" || event.data?.type === "CINEMATIC_COMPLETE") {
+        console.log("[v0] Cinematic message received:", event.data.type)
+        // Redirect to Experiences tab
+        goExperiences()
+      }
+    }
+
+    window.addEventListener("message", handleMessage)
+    return () => window.removeEventListener("message", handleMessage)
+  }, [goExperiences])
+
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood)
     setStep("loom")
@@ -328,7 +341,11 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   }
 
   const handleLoomComplete = () => {
-    setStep("pathway")
+    if (selectedMood === "Inspired") {
+      goExperiences()
+    } else {
+      setStep("pathway")
+    }
   }
 
   const CinematicScene = ({
@@ -476,31 +493,6 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
               transition={{ duration: 0.6 }}
               className="flex-1 overflow-y-auto px-4 pt-8 pb-28"
             >
-              {selectedMood === "Inspired" && (
-                <div className="fixed inset-0 z-50 bg-black">
-                  <iframe
-                    src="/cinematic/index.html"
-                    title="Secrets Cinematic"
-                    className="w-full h-full border-none"
-                    allow="autoplay; fullscreen"
-                  />
-                  <button
-                    onClick={() => setStep("seal")}
-                    className="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="white"
-                      className="w-6 h-6"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              )}
-
               {selectedMood === "Adventurous" && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -633,133 +625,6 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                       </button>
                     </div>
                   </div>
-                </motion.div>
-              )}
-
-              {selectedMood === "Inspired" && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6 }}
-                  className="fixed inset-0 z-50 bg-black"
-                >
-                  {/* Cinematic Archive Scroll */}
-                  <div className="h-full overflow-y-auto snap-y snap-mandatory">
-                    {/* Scene 1: Jamdani */}
-                    <CinematicScene
-                      image={imgs.jamdani1}
-                      title="Jamdani Secrets"
-                      note1="🧵 Threads carry time in silence."
-                      note2="Every weave is a whisper from Bengal's past."
-                      label="Jamdani"
-                      dark
-                    />
-
-                    {/* Scene 2: Fisherman */}
-                    <CinematicScene
-                      image={imgs.fishermen1}
-                      title="The Fisherman's Secret"
-                      note1="🌊 The river awakens before the city."
-                      note2="Boats drift like memories across dawn's water."
-                      label="Fisherman"
-                      light
-                    />
-
-                    {/* Scene 3: Panam */}
-                    <CinematicScene
-                      image={imgs.panam}
-                      title="Panam Nagar"
-                      note1="🏚 Lantern-lit alleys whisper merchant legacies."
-                      note2="Crumbling walls breathe forgotten trade stories."
-                      label="Panam"
-                      dark
-                    />
-
-                    {/* Scene 4: Old Dhaka */}
-                    <CinematicScene
-                      image={imgs.oldDhaka}
-                      title="Echoes of Old Dhaka"
-                      note1="🌶 A spice market whispers even when empty."
-                      note2="The scent of cardamom is memory itself."
-                      label="Old Dhaka"
-                      light
-                    />
-
-                    {/* Scene 5: Culinary */}
-                    <CinematicScene
-                      image={imgs.culinary}
-                      title="Culinary Pilgrimage"
-                      note1="🍲 Kitchens keep memory alive with every flame."
-                      note2="Taste is the archive of the tongue."
-                      label="Culinary"
-                      dark
-                    />
-
-                    {/* Scene 6: Sufi */}
-                    <CinematicScene
-                      image={imgs.sufi}
-                      title="Sufi Saints"
-                      note1="🕌 Chants weave silence into devotion."
-                      note2="Echoes of zikr ripple through eternity."
-                      label="Sufi"
-                      light
-                    />
-
-                    {/* Scene 7: Camps */}
-                    <CinematicScene
-                      image="/tour-voices-of-the-camps.jpeg"
-                      title="Voices of the Camps"
-                      note1="🏕 Whispers carry stories of survival."
-                      note2="Every tent is a library of loss and hope."
-                      label="Camps"
-                      dark
-                      mystery
-                    />
-
-                    {/* Scene 8: Memory Scape I */}
-                    <CinematicScene
-                      title="Memory Scape I"
-                      note1="✨ Stitched notes of forgotten times."
-                      note2="Fragments rearrange as if alive."
-                      label="Memory I"
-                      light
-                    />
-
-                    {/* Scene 9: Memory Scape II */}
-                    <CinematicScene
-                      title="Memory Scape II"
-                      note1="✍️ Letters drift, fall, then reform."
-                      note2="The archive itself is breathing."
-                      label="Memory II"
-                      dark
-                    />
-
-                    {/* Scene 10: Memory Scape III */}
-                    <CinematicScene
-                      title="Memory Scape III"
-                      note1="❓ A mystery remains unsolved."
-                      note2="Some secrets are not meant to be found."
-                      label="Memory III"
-                      light
-                      mystery
-                    />
-                  </div>
-
-                  {/* Close Button */}
-                  <button
-                    onClick={() => setIsRevealed(false)}
-                    className="fixed top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="white"
-                      className="w-6 h-6"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
                 </motion.div>
               )}
 
@@ -1895,17 +1760,18 @@ export default function SecretsBangladeshApp() {
     }
   }, [])
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === "CINEMATIC_BACK") {
-        setRoute("experiences")
-        setBottom("experiences")
-      }
-    }
+  // Removed duplicate message listener, as it's now in Inspire component
+  // useEffect(() => {
+  //   const handleMessage = (event: MessageEvent) => {
+  //     if (event.data.type === "CINEMATIC_BACK") {
+  //       setRoute("experiences")
+  //       setBottom("experiences")
+  //     }
+  //   }
 
-    window.addEventListener("message", handleMessage)
-    return () => window.removeEventListener("message", handleMessage)
-  }, [])
+  //   window.addEventListener("message", handleMessage)
+  //   return () => window.removeEventListener("message", handleMessage)
+  // }, [])
 
   const openDetail = (exp: any) => {
     setDetail(exp)
