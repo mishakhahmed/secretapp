@@ -176,59 +176,59 @@ function PaginationDots({ total, active }: { total: number; active: number }) {
 
 /* ===================== SPLASH ===================== */
 function Splash({ onContinue, imgs }: { onContinue: () => void; imgs: any }) {
-  const [heroIndex, setHeroIndex] = useState(0)
-  const heroImages = [imgs.heroImage1, imgs.heroImage2, imgs.heroImage3]
-  const touchStartX = useRef(0)
-  const touchEndX = useRef(0)
+  const [hoverStartTime, setHoverStartTime] = useState<number | null>(null)
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHeroIndex((prev) => (prev + 1) % heroImages.length)
-    }, 1500)
-    return () => clearInterval(interval)
-  }, [heroImages.length])
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX
+  const handleSealHoverStart = () => {
+    setHoverStartTime(Date.now())
+    console.log("[v0] Seal Hover Start")
   }
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    touchEndX.current = e.changedTouches[0].clientX
-    const diff = touchStartX.current - touchEndX.current
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
-        setHeroIndex((prev) => (prev + 1) % heroImages.length)
-      } else {
-        setHeroIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length)
-      }
+  const handleSealHoverEnd = () => {
+    if (hoverStartTime) {
+      const dwellTime = Date.now() - hoverStartTime
+      console.log("[v0] Seal Hover End", `${dwellTime}ms`)
+      setHoverStartTime(null)
     }
+  }
+
+  const handleSealClick = () => {
+    const dwellTime = hoverStartTime ? Date.now() - hoverStartTime : 0
+    console.log("[v0] Seal Clicked", { dwell: `${dwellTime}ms` })
+    setHoverStartTime(null)
+    onContinue()
   }
 
   return (
     <Screen>
-      <div className="relative h-full" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-        <div className="absolute inset-0">
-          <SmartImg src={heroImages[heroIndex]} alt="Secrets Bangladesh" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/45" />
-        </div>
-        <div className="relative z-10 h-full flex flex-col items-center justify-end text-center p-8">
+      <div className="relative h-full bg-[#0c0c0c]">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center p-8">
           <motion.h1
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="text-white text-3xl font-extrabold tracking-wider uppercase"
+            className="text-2xl font-bold text-center text-[#FFD400] leading-tight mb-2"
+            style={{ fontFamily: "Playfair Display, serif" }}
           >
-            Immersive Experiences
+            Every city keeps its secrets.
           </motion.h1>
-          <p className="text-white/90 mt-2 max-w-xs">Raw • Radiant • Real</p>
-          <Button
-            onClick={onContinue}
-            className="mt-6 mb-10 rounded-xl px-6 py-3 w-full max-w-sm text-black min-h-[48px]"
-            style={{ backgroundColor: YELLOW }}
+          <p className="text-center text-white/90 text-sm mb-8">Break the seal to discover yours.</p>
+
+          <button
+            onClick={handleSealClick}
+            onMouseEnter={handleSealHoverStart}
+            onMouseLeave={handleSealHoverEnd}
+            onTouchStart={handleSealHoverStart}
+            onTouchEnd={handleSealHoverEnd}
+            className="relative w-40 h-40 rounded-full transition-all hover:scale-105"
           >
-            Inspire Me
-          </Button>
-          <PaginationDots total={heroImages.length} active={heroIndex} />
+            <img
+              src="/assets/Secrets-wax-seal.png"
+              alt="Secrets Bangladesh Wax Seal"
+              className="w-full h-full object-contain drop-shadow-2xl"
+            />
+          </button>
+
+          <p className="text-center text-white/80 text-sm mt-8">Tap the seal to begin your journey</p>
         </div>
       </div>
     </Screen>
@@ -259,7 +259,7 @@ function MoodCard({ mood, onSelect }: any) {
 
 /* ===================== INSPIRE (Full Mood Pathways) ===================== */
 function Inspire({ onPickMood, goExperiences, imgs }: any) {
-  const [step, setStep] = useState<"seal" | "mood" | "loom" | "pathway">("seal")
+  const [step, setStep] = useState<"seal" | "mood" | "loom" | "pathway">("mood")
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
   const [isRevealed, setIsRevealed] = useState(false)
   const [hoverStartTime, setHoverStartTime] = useState<number | null>(null)
@@ -408,7 +408,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   return (
     <Screen>
       <div className="h-full flex flex-col overflow-hidden bg-[#0c0c0c]">
-        <AppHeader title="Inspire Me" />
+        <AppHeader title="Pursuit of Feeling" />
 
         <AnimatePresence mode="wait">
           {step === "seal" && (
@@ -456,7 +456,10 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
               transition={{ duration: 0.5 }}
               className="flex-1 flex flex-col items-center justify-center px-4 pb-28"
             >
-              <h2 className="text-2xl text-[#FFD400] font-semibold mb-8">Choose your mood</h2>
+              <div className="text-center mb-8">
+                <h2 className="text-xl text-[#FFD400] font-semibold mb-2">Our Secret Starts with you,</h2>
+                <p className="text-lg text-white/90">......What do you feel? ......</p>
+              </div>
               <div className="grid grid-cols-2 gap-4 w-full max-w-md">
                 {moods.map((mood) => (
                   <button
@@ -775,6 +778,54 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                         className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
                       >
                         Share with Friends
+                      </button>
+                      <button
+                        onClick={() => handlePathwayClick("Enquire Now")}
+                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
+                      >
+                        Enquire Now
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {selectedMood === "Inspired" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4"
+                >
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h2
+                      className="text-xl font-bold text-[#FFD400] mb-2"
+                      style={{ fontFamily: "Playfair Display, serif" }}
+                    >
+                      Inspired • Muse's Canvas
+                    </h2>
+                    <p className="text-white/90 text-sm mb-4">
+                      Behold the beauty, absorb the hues, let creativity flow.
+                    </p>
+                    <div className="relative h-40 rounded-xl overflow-hidden bg-gradient-to-br from-purple-800 to-pink-600 mb-4">
+                      <div className="absolute inset-0 bg-[url(/assets/abstract-paint-strokes.png)] bg-cover opacity-40" />
+                      <div className="absolute inset-0 flex items-center justify-center text-center">
+                        <h3 className="text-white text-2xl font-bold drop-shadow-lg">The Art of Bangladesh</h3>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h3 className="text-lg font-bold text-[#FFD400] mb-2">Your Creative Spark (Plan)</h3>
+                    <p className="text-white/80 text-sm mb-4">
+                      These moments are your inspiration. Save them, share them, or start creating.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => trackEvent("Save Inspiration", "Inspired")}
+                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
+                      >
+                        Save Inspiration
                       </button>
                       <button
                         onClick={() => handlePathwayClick("Enquire Now")}
@@ -1718,7 +1769,7 @@ function BottomNav({ active, setActive, showSiteMap }: any) {
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t border-neutral-200 bg-white/90 backdrop-blur pb-6">
       <div className="flex">
-        <Item id="inspire" label="Inspire" icon={HomeIcon} />
+        <Item id="inspire" label="Feel" icon={HomeIcon} />
         <Item id="experiences" label="Experiences" icon={BookOpen} />
         <Item id="stories" label="Stories" icon={Heart} />
         <Item id="map" label="Map" icon={MapPin} />
