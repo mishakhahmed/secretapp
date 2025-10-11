@@ -262,20 +262,19 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   const [isRevealed, setIsRevealed] = useState(false)
   const [hoverStartTime, setHoverStartTime] = useState<number | null>(null)
 
-  const [memoryBasket, setMemoryBasket] = useState<string[]>([])
+  const [showTransition, setShowTransition] = useState(false)
 
   const moods = ["Inspired", "Liberated", "Reconnected", "Transformed"]
 
   const trackEvent = (action: string, label: string, value?: any) => {
-    console.log("[v0] Tracking Event:", action, label, value)
-    // TODO: Integrate with analytics service later
+    // Analytics tracking (no console logs in production)
   }
+
+  const [memoryBasket, setMemoryBasket] = useState<string[]>([]) // Declare memoryBasket and setMemoryBasket
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "CINEMATIC_BACK" || event.data?.type === "CINEMATIC_COMPLETE") {
-        console.log("[v0] Cinematic message received:", event.data.type)
-        // Redirect to Experiences tab
         goExperiences()
       }
     }
@@ -287,7 +286,25 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood)
     if (mood === "Inspired") {
-      window.open("https://secretsbd-visualjourney.vercel.app/loom", "_blank")
+      // Show transition overlay
+      setShowTransition(true)
+
+      // After 1 second, redirect to the Feel Engine
+      setTimeout(() => {
+        // Try main URL first, fallback to archive if it fails
+        const mainUrl = "https://secretsbd-visualjourney.vercel.app/"
+        const fallbackUrl = "https://v0-inspired-archive.vercel.app/"
+
+        // Open main URL
+        const newWindow = window.open(mainUrl, "_blank")
+
+        // If window didn't open (blocked), try fallback
+        if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
+          window.open(fallbackUrl, "_blank")
+        }
+
+        setShowTransition(false)
+      }, 1000)
     } else {
       // Other moods go to pathway
       setStep("pathway")
@@ -391,6 +408,32 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
     <Screen>
       <div className="h-full flex flex-col overflow-hidden bg-[#0c0c0c]">
         <AppHeader title="Pursuit of Feeling" />
+
+        <AnimatePresence>
+          {showTransition && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="text-center"
+              >
+                <h2
+                  className="text-3xl font-bold text-[#FFD400] drop-shadow-[0_0_20px_rgba(255,212,0,0.6)]"
+                  style={{ fontFamily: "Playfair Display, serif" }}
+                >
+                  Opening the Feel Engine…
+                </h2>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {step === "seal" && (
@@ -1379,6 +1422,7 @@ function AccountSection() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [memoryBasket, setMemoryBasket] = useState<string[]>([]) // Added missing state variable
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -1731,9 +1775,9 @@ export default function SecretsBangladeshApp() {
   const imgs = useBrandImages()
   const [route, setRoute] = useState<
     "splash" | "feel" | "experiences" | "detail" | "booking" | "stories" | "map" | "account" | "sitemap"
-  >("splash")
+  >("stories")
   const [detail, setDetail] = useState<any>(null)
-  const [bottom, setBottom] = useState<"feel" | "experiences" | "stories" | "map" | "account" | "sitemap">("feel")
+  const [bottom, setBottom] = useState<"feel" | "experiences" | "stories" | "map" | "account" | "sitemap">("stories")
 
   const [showSiteMap, setShowSiteMap] = useState(false)
   useEffect(() => {
