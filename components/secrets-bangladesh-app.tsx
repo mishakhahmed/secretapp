@@ -1310,10 +1310,10 @@ function SiteMap({ go }: { go: (route: string) => void }) {
   const items = [
     { id: "splash", title: "Home (Splash)", desc: "Hero + Inspire Me", action: () => go("splash") },
     {
-      id: "inspire",
-      title: "Inspire (Mood Funnel)",
+      id: "feel",
+      title: "Feel (Mood Funnel)",
       desc: "Curious / Adventurous / Reconnected / Inspired",
-      action: () => go("inspire"),
+      action: () => go("feel"),
     },
     { id: "experiences", title: "Experiences", desc: "Search + filters + list", action: () => go("experiences") },
     { id: "stories", title: "Stories", desc: "Field stories + audio", action: () => go("stories") },
@@ -1715,7 +1715,7 @@ function BottomNav({ active, setActive, showSiteMap }: any) {
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t border-neutral-200 bg-white/90 backdrop-blur pb-6">
       <div className="flex">
-        <Item id="inspire" label="Feel" icon={HomeIcon} />
+        <Item id="feel" label="Feel" icon={HomeIcon} />
         <Item id="experiences" label="Experiences" icon={BookOpen} />
         <Item id="stories" label="Stories" icon={Heart} />
         <Item id="map" label="Map" icon={MapPin} />
@@ -1730,10 +1730,10 @@ function BottomNav({ active, setActive, showSiteMap }: any) {
 export default function SecretsBangladeshApp() {
   const imgs = useBrandImages()
   const [route, setRoute] = useState<
-    "splash" | "inspire" | "experiences" | "detail" | "booking" | "stories" | "map" | "account" | "sitemap"
+    "splash" | "feel" | "experiences" | "detail" | "booking" | "stories" | "map" | "account" | "sitemap"
   >("splash")
   const [detail, setDetail] = useState<any>(null)
-  const [bottom, setBottom] = useState<"inspire" | "experiences" | "stories" | "map" | "account" | "sitemap">("inspire")
+  const [bottom, setBottom] = useState<"feel" | "experiences" | "stories" | "map" | "account" | "sitemap">("feel")
 
   const [showSiteMap, setShowSiteMap] = useState(false)
   useEffect(() => {
@@ -1745,8 +1745,8 @@ export default function SecretsBangladeshApp() {
     const params = new URLSearchParams(window.location.search)
     const moodParam = params.get("mood")
     if (moodParam) {
-      setRoute("inspire")
-      setBottom("inspire")
+      setRoute("feel")
+      setBottom("feel")
       // Trigger the mood pathway display
       setTimeout(() => {
         const moodButton = document.querySelector(`[data-mood="${moodParam}"]`)
@@ -1791,17 +1791,15 @@ export default function SecretsBangladeshApp() {
       <div className="absolute inset-0 flex flex-col">
         <StatusBar />
         <AnimatePresence mode="wait">
-          {route === "splash" && <Splash key="splash" onContinue={() => setRoute("inspire")} imgs={imgs} />}
+          {route === "splash" && <Splash key="splash" onContinue={() => setRoute("feel")} imgs={imgs} />}
 
-          {route === "inspire" && (
+          {route === "feel" && (
             <Inspire
-              key="inspire"
+              key="feel"
               imgs={imgs}
               onPickMood={(mood) => {
                 setBottom("experiences")
                 setRoute("experiences")
-                // The original onPickMood was not used here, so removed.
-                // If needed, it should be passed down and called within handleMoodSelect.
               }}
               goExperiences={() => {
                 setBottom("experiences")
@@ -1814,7 +1812,7 @@ export default function SecretsBangladeshApp() {
             <Experiences
               key="experiences"
               imgs={imgs}
-              onBack={() => setRoute("inspire")}
+              onBack={() => setRoute("feel")}
               onOpenDetail={openDetail}
               activeCategoryId={"all"}
             />
@@ -1835,21 +1833,21 @@ export default function SecretsBangladeshApp() {
 
           {route === "stories" && (
             <Screen key="stories">
-              <AppHeader title="Stories" onBack={() => setRoute("inspire")} />
+              <AppHeader title="Stories" onBack={() => setRoute("feel")} />
               <StoriesSection imgs={imgs} />
             </Screen>
           )}
 
           {route === "map" && (
             <Screen key="map">
-              <AppHeader title="Map" onBack={() => setRoute("inspire")} />
+              <AppHeader title="Map" onBack={() => setRoute("feel")} />
               <MapSection />
             </Screen>
           )}
 
           {route === "account" && (
             <Screen key="account">
-              <AppHeader title="Account" onBack={() => setRoute("inspire")} />
+              <AppHeader title="Account" onBack={() => setRoute("feel")} />
               <AccountSection />
             </Screen>
           )}
@@ -1860,7 +1858,7 @@ export default function SecretsBangladeshApp() {
               go={(to) => {
                 setRoute(to as any)
 
-                const tabRoutes = new Set(["inspire", "experiences", "stories", "map", "account", "sitemap"])
+                const tabRoutes = new Set(["feel", "experiences", "stories", "map", "account", "sitemap"])
                 if (tabRoutes.has(to)) {
                   setBottom(to as any)
                 }
