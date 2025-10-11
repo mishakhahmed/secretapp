@@ -1747,15 +1747,33 @@ function AccountSection() {
 
 /* ===================== BOTTOM NAV ===================== */
 function BottomNav({ active, setActive, showSiteMap }: any) {
-  const Item = ({ id, label, icon: Icon }: any) => (
-    <button
-      onClick={() => setActive(id)}
-      className={`flex flex-col items-center justify-center gap-1.5 flex-1 py-3 min-h-[56px] ${active === id ? "text-black" : "text-neutral-500"}`}
-    >
-      <Icon className="w-7 h-7" />
-      <span className="text-xs uppercase tracking-widest">{label}</span>
-    </button>
-  )
+  const Item = ({ id, label, icon: Icon }: any) => {
+    const handleClick = () => {
+      if (id === "feel") {
+        try {
+          window.open("https://secretsbd-visualjourney.vercel.app/", "_blank")
+        } catch {
+          window.open("https://v0-inspired-archive.vercel.app/", "_blank")
+        }
+        return
+      }
+
+      setActive(id)
+    }
+
+    return (
+      <button
+        onClick={handleClick}
+        className={`flex flex-col items-center justify-center gap-1.5 flex-1 py-3 min-h-[56px] ${
+          active === id ? "text-black" : "text-neutral-500"
+        }`}
+      >
+        <Icon className="w-7 h-7" />
+        <span className="text-xs uppercase tracking-widest">{label}</span>
+      </button>
+    )
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t border-neutral-200 bg-white/90 backdrop-blur pb-6">
       <div className="flex">
@@ -1769,7 +1787,6 @@ function BottomNav({ active, setActive, showSiteMap }: any) {
     </div>
   )
 }
-
 /* ===================== ROOT ===================== */
 export default function SecretsBangladeshApp() {
   const imgs = useBrandImages()
