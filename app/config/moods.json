@@ -1,0 +1,13 @@
+{
+  "moods": {
+    "primary": ["Inspired", "Liberated", "Reconnected", "Transformed"],
+    "hidden": "Curious",
+    "archetypes": {
+      "Inspired": { "role": "Creator", "emotion": "Wonder" },
+      "Liberated": { "role": "Liberator", "emotion": "Freedom" },
+      "Reconnected": { "role": "Connector", "emotion": "Belonging" },
+      "Transformed": { "role": "Seeker", "emotion": "Awakening" },
+      "Curious": { "role": "Explorer", "emotion": "Discovery" }
+    }
+  }
+}

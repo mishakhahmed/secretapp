@@ -29,8 +29,6 @@ import { ExpandableText } from "@/components/ExpandableText"
 import { Itinerary } from "@/components/Itinerary"
 import dynamic from "next/dynamic"
 
-import { Loom } from "./Loom"
-
 const LeafletMap = dynamic(() => import("@/components/LeafletMap"), { ssr: false })
 
 /*************************************************
@@ -50,10 +48,10 @@ const IMG = {
   heroImage1: "/1-Home-vegetable-seller-secrets.jpeg",
   heroImage2: "/hero-image-2.jpg",
   heroImage3: "/hero-image-3.jpg",
-  moodCurious: "/mood-curious.jpeg",
-  moodAdventurous: "/mood-adventurous.jpeg",
-  moodReconnected: "/mood-reconnected.jpeg",
   moodInspired: "/mood-inspired.jpeg",
+  moodLiberated: "/mood-liberated.jpeg",
+  moodReconnected: "/mood-reconnected.jpeg",
+  moodTransformed: "/mood-transformed.jpeg",
 
   // tours - multiple images per tour
   fishermen1: "/tour-fishermens-secret-1.jpeg",
@@ -73,7 +71,7 @@ const IMG = {
   storyPanam: "/stories/story-threads-of-panam.jpg",
   storyOldDhaka: "/stories/story-old-dhaka-guide.jpg",
   storySpice: "/stories/story-old-dhaka-spice.jpg",
-  storyPartitionFish: "/stories/story-partition-fish.jpg",
+  storyPartitionFish: "/stories/story-partition-fish.jpeg",
   storyRevatiBhaban: "/stories/story-revati-bhaban.jpeg",
 }
 
@@ -259,15 +257,14 @@ function MoodCard({ mood, onSelect }: any) {
 
 /* ===================== INSPIRE (Full Mood Pathways) ===================== */
 function Inspire({ onPickMood, goExperiences, imgs }: any) {
-  const [step, setStep] = useState<"seal" | "mood" | "loom" | "pathway">("mood")
+  const [step, setStep] = useState<"seal" | "mood" | "pathway">("mood")
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
   const [isRevealed, setIsRevealed] = useState(false)
   const [hoverStartTime, setHoverStartTime] = useState<number | null>(null)
 
-  const [weaveTiles, setWeaveTiles] = useState<string[]>([])
   const [memoryBasket, setMemoryBasket] = useState<string[]>([])
 
-  const moods = ["Adventurous", "Curious", "Inspired", "Reconnected"]
+  const moods = ["Inspired", "Liberated", "Reconnected", "Transformed"]
 
   const trackEvent = (action: string, label: string, value?: any) => {
     console.log("[v0] Tracking Event:", action, label, value)
@@ -289,7 +286,13 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
 
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood)
-    setStep("loom")
+    if (mood === "Inspired") {
+      // Inspired mood goes directly to experiences
+      goExperiences()
+    } else {
+      // Other moods go to pathway
+      setStep("pathway")
+    }
   }
 
   const handleSealHoverStart = () => {
@@ -321,30 +324,10 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
     }
   }
 
-  const addToWeave = (tile: string) => {
-    if (weaveTiles.length < 12) {
-      setWeaveTiles([...weaveTiles, tile])
-      trackEvent("Weave Tile Added", tile)
-    }
-  }
-
-  const clearWeave = () => {
-    setWeaveTiles([])
-    trackEvent("Weave Cleared", "Jamdani Board")
-  }
-
   const addToBasket = (memory: string) => {
     if (!memoryBasket.includes(memory)) {
       setMemoryBasket([...memoryBasket, memory])
       trackEvent("Memory Added", memory)
-    }
-  }
-
-  const handleLoomComplete = () => {
-    if (selectedMood === "Inspired") {
-      goExperiences()
-    } else {
-      setStep("pathway")
     }
   }
 
@@ -475,19 +458,6 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
             </motion.div>
           )}
 
-          {step === "loom" && selectedMood && (
-            <motion.div
-              key="loom"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-              className="fixed inset-0 z-50"
-            >
-              <Loom mood={selectedMood.toLowerCase()} onComplete={handleLoomComplete} />
-            </motion.div>
-          )}
-
           {step === "pathway" && selectedMood && (
             <motion.div
               key="pathway"
@@ -496,7 +466,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
               transition={{ duration: 0.6 }}
               className="flex-1 overflow-y-auto px-4 pt-8 pb-28"
             >
-              {selectedMood === "Adventurous" && (
+              {selectedMood === "Liberated" && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -508,55 +478,38 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                       className="text-xl font-bold text-[#FFD400] mb-2"
                       style={{ fontFamily: "Playfair Display, serif" }}
                     >
-                      Adventurous • Waves
+                      Liberated • Breaking Boundaries
                     </h2>
                     <p className="text-white/90 text-sm mb-4">
-                      Step boldly. Each shuffle is a hidden corner. Your plan becomes your catch of the day.
+                      Freedom is found in the journey. Break free from the ordinary and discover uncharted paths.
                     </p>
-                    {/* Waves animation */}
-                    <div className="relative h-40 rounded-xl overflow-hidden bg-[#0f1c25] border border-[#3a3a3a] mb-4">
-                      <div
-                        className="absolute left-[-10%] right-[-10%] h-[60%] top-0 opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
-                        style={{
-                          background:
-                            "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
-                        }}
-                      />
-                      <div
-                        className="absolute left-[-10%] right-[-10%] h-[60%] top-[30%] opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
-                        style={{
-                          background:
-                            "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
-                          animationDelay: "-2s",
-                        }}
-                      />
-                      <div
-                        className="absolute left-[-10%] right-[-10%] h-[60%] top-[60%] opacity-35 animate-[ripple_6s_infinite_ease-in-out]"
-                        style={{
-                          background:
-                            "radial-gradient(ellipse at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%)",
-                          animationDelay: "-4s",
-                        }}
-                      />
+                    {/* Freedom animation */}
+                    <div className="relative h-40 rounded-xl overflow-hidden bg-gradient-to-br from-blue-900 to-cyan-600 mb-4">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-32 h-32 border-4 border-white/30 rounded-full animate-ping" />
+                        <div className="absolute w-24 h-24 border-4 border-white/50 rounded-full animate-pulse" />
+                      </div>
                     </div>
                   </div>
 
                   <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                    <h3 className="text-lg font-bold text-[#FFD400] mb-3">Catch of the Day (Itinerary)</h3>
+                    <h3 className="text-lg font-bold text-[#FFD400] mb-3">Your Liberation Path</h3>
                     <div className="space-y-3">
                       <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
-                        <div className="font-semibold text-white text-sm">MORNING — River Dawn</div>
+                        <div className="font-semibold text-white text-sm">MORNING — Open Waters</div>
                         <div className="text-xs text-white/80 mt-1">
-                          Boat launch • Tea by the pier • Casting with fishermen
+                          Sail beyond the horizon • Feel the wind of freedom
                         </div>
                       </div>
                       <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
-                        <div className="font-semibold text-white text-sm">AFTERNOON — Village Table</div>
-                        <div className="text-xs text-white/80 mt-1">Cook your catch • Stories from the riverfolk</div>
+                        <div className="font-semibold text-white text-sm">AFTERNOON — Untamed Trails</div>
+                        <div className="text-xs text-white/80 mt-1">Explore hidden paths • Break your own trail</div>
                       </div>
                       <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
-                        <div className="font-semibold text-white text-sm">EVENING — Lantern Drift</div>
-                        <div className="text-xs text-white/80 mt-1">Slow float • Sufi songs by the water</div>
+                        <div className="font-semibold text-white text-sm">EVENING — Liberation Ritual</div>
+                        <div className="text-xs text-white/80 mt-1">
+                          Release what holds you back • Embrace new beginnings
+                        </div>
                       </div>
                     </div>
                     <button
@@ -565,68 +518,6 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                     >
                       Enquire Now
                     </button>
-                  </div>
-                </motion.div>
-              )}
-
-              {selectedMood === "Curious" && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                  className="space-y-4"
-                >
-                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                    <h2
-                      className="text-xl font-bold text-[#FFD400] mb-2"
-                      style={{ fontFamily: "Playfair Display, serif" }}
-                    >
-                      Curious • Hidden Script
-                    </h2>
-                    <p className="text-white/90 text-sm mb-4">
-                      Lift the veil. Dhaka whispers to the ones who look closer.
-                    </p>
-                    <div className="space-y-2 bg-[#201d18] border border-[#3a3a3a] rounded-xl p-4">
-                      <details open className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
-                        <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
-                          Clue #1 — Panam Nagar
-                        </summary>
-                        <p className="text-white/80 text-xs mt-2">Ruins of merchants, lintels lacquered with time.</p>
-                      </details>
-                      <details className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
-                        <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
-                          Clue #2 — Armenian Church
-                        </summary>
-                        <p className="text-white/80 text-xs mt-2">Quiet courtyards, names carved into stone.</p>
-                      </details>
-                      <details className="bg-[#0f0f0f] border border-dashed border-[#FFD400] rounded-lg p-3">
-                        <summary className="cursor-pointer text-[#FFD400] font-bold text-sm">
-                          Clue #3 — Chawk Bazaar
-                        </summary>
-                        <p className="text-white/80 text-xs mt-2">Spice and steam; a map written in aromas.</p>
-                      </details>
-                    </div>
-                  </div>
-
-                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
-                    <h3 className="text-lg font-bold text-[#FFD400] mb-2">Your Hidden Script (Plan)</h3>
-                    <p className="text-white/80 text-sm mb-4">
-                      These layers form tomorrow's path. Save or enquire to confirm.
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => trackEvent("Save Plan", "Curious")}
-                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                      >
-                        Save Plan
-                      </button>
-                      <button
-                        onClick={() => handlePathwayClick("Enquire Now")}
-                        className="flex-1 bg-[#FFD400] text-black font-bold px-4 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px]"
-                      >
-                        Enquire Now
-                      </button>
-                    </div>
                   </div>
                 </motion.div>
               )}
@@ -786,6 +677,62 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
                         Enquire Now
                       </button>
                     </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {selectedMood === "Transformed" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="space-y-4"
+                >
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h2
+                      className="text-xl font-bold text-[#FFD400] mb-2"
+                      style={{ fontFamily: "Playfair Display, serif" }}
+                    >
+                      Transformed • Journey of Awakening
+                    </h2>
+                    <p className="text-white/90 text-sm mb-4">
+                      Transformation begins within. Seek the experiences that reshape your perspective.
+                    </p>
+                    {/* Transformation animation */}
+                    <div className="relative h-40 rounded-xl overflow-hidden bg-gradient-to-br from-purple-900 to-pink-600 mb-4">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-20 h-20 bg-white/20 rounded-full animate-[spin_3s_linear_infinite]" />
+                        <div className="absolute w-32 h-32 border-2 border-white/30 rounded-full animate-[spin_4s_linear_infinite_reverse]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#1a1a1a] border border-[#FFD400] rounded-2xl p-5 shadow-lg">
+                    <h3 className="text-lg font-bold text-[#FFD400] mb-3">Your Transformation Journey</h3>
+                    <div className="space-y-3">
+                      <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
+                        <div className="font-semibold text-white text-sm">MORNING — Inner Awakening</div>
+                        <div className="text-xs text-white/80 mt-1">
+                          Meditation by the river • Connect with your essence
+                        </div>
+                      </div>
+                      <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
+                        <div className="font-semibold text-white text-sm">AFTERNOON — Sacred Rituals</div>
+                        <div className="text-xs text-white/80 mt-1">Ancient practices • Wisdom from local mystics</div>
+                      </div>
+                      <div className="bg-[#0f1418] border border-dashed border-[#FFD400] rounded-xl p-3">
+                        <div className="font-semibold text-white text-sm">EVENING — Rebirth Ceremony</div>
+                        <div className="text-xs text-white/80 mt-1">
+                          Lantern release • Embrace your transformed self
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handlePathwayClick("Enquire Now")}
+                      className="w-full bg-[#FFD400] text-black font-bold px-6 py-2.5 rounded-lg hover:bg-[#ffd400]/90 transition-colors min-h-[44px] mt-4"
+                    >
+                      Enquire Now
+                    </button>
                   </div>
                 </motion.div>
               )}
@@ -1457,7 +1404,7 @@ function AccountSection() {
     e.preventDefault()
     // Simple signup - store in localStorage
     const userData = { email, name }
-    localStorage.setItem("secrets_user", JSON.stringify(userData))
+    localStorage.setItem("secrets_user", JSON.JSON.stringify(userData))
     setIsLoggedIn(true)
   }
 
