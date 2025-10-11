@@ -2,13 +2,18 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import moodConfig from "@/app/config/moods.json"
 
 type Step = "seal" | "mood" | "loom" | "ritual"
-type Mood = "adventurous" | "curious" | "reconnected" | "inspire"
+type Mood = keyof typeof moodConfig.moods.archetypes
 
 function InspirePageContent() {
   const [step, setStep] = useState<Step>("seal")
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null)
+
+  const primaryMoods = moodConfig.moods.primary
+  const hiddenMood = moodConfig.moods.hidden
+  const archetypes = moodConfig.moods.archetypes
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -21,14 +26,12 @@ function InspirePageContent() {
     return () => window.removeEventListener("message", handleMessage)
   }, [])
 
-  const moods = [
-    { id: "adventurous" as Mood, label: "Adventurous", color: "#FF6B35" },
-    { id: "curious" as Mood, label: "Curious", color: "#4ECDC4" },
-    { id: "reconnected" as Mood, label: "Reconnected", color: "#95E1D3" },
-    { id: "inspire" as Mood, label: "Inspire Me", color: "#FFD400" },
-  ]
-
   const handleMoodSelect = (mood: Mood) => {
+    if (mood === "Inspired") {
+      window.location.href = "https://secretsbd-visualjourney.vercel.app/loom"
+      return
+    }
+
     setSelectedMood(mood)
     setStep("loom")
     setTimeout(() => {
@@ -72,18 +75,28 @@ function InspirePageContent() {
           >
             <h2 className="text-3xl font-serif text-white mb-12 text-center">How do you feel today?</h2>
             <div className="grid grid-cols-2 gap-6 max-w-2xl w-full">
-              {moods.map((mood) => (
+              {primaryMoods.map((mood) => (
                 <button
-                  key={mood.id}
-                  onClick={() => handleMoodSelect(mood.id)}
+                  key={mood}
+                  onClick={() => handleMoodSelect(mood as Mood)}
                   className="p-8 rounded-2xl border-2 border-white/20 hover:border-white/40 transition-all hover:scale-105"
-                  style={{ backgroundColor: `${mood.color}15` }}
+                  style={{ backgroundColor: "#ffffff10" }}
                 >
-                  <div className="w-16 h-16 rounded-full mx-auto mb-4" style={{ backgroundColor: mood.color }} />
-                  <p className="text-white text-xl font-semibold">{mood.label}</p>
+                  <div className="w-16 h-16 rounded-full mx-auto mb-4 bg-[#FFD400]" />
+                  <p className="text-white text-xl font-semibold">{mood}</p>
+                  <p className="text-white/60 text-sm italic">{archetypes[mood].emotion}</p>
                 </button>
               ))}
             </div>
+
+            {hiddenMood && (
+              <button
+                onClick={() => handleMoodSelect(hiddenMood as Mood)}
+                className="mt-10 px-6 py-3 border border-white/30 rounded-full text-white/70 hover:text-white transition-all"
+              >
+                Unlock {hiddenMood}
+              </button>
+            )}
           </motion.div>
         )}
 
