@@ -287,8 +287,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood)
     if (mood === "Inspired") {
-      // Inspired mood goes directly to experiences
-      goExperiences()
+      window.open("https://secretsbd-visualjourney.vercel.app/loom", "_blank")
     } else {
       // Other moods go to pathway
       setStep("pathway")
