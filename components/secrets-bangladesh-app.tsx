@@ -262,19 +262,20 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   const [isRevealed, setIsRevealed] = useState(false)
   const [hoverStartTime, setHoverStartTime] = useState<number | null>(null)
 
-  const [showTransition, setShowTransition] = useState(false)
+  const [memoryBasket, setMemoryBasket] = useState<string[]>([])
 
   const moods = ["Inspired", "Liberated", "Reconnected", "Transformed"]
 
   const trackEvent = (action: string, label: string, value?: any) => {
-    // Analytics tracking (no console logs in production)
+    console.log("[v0] Tracking Event:", action, label, value)
+    // TODO: Integrate with analytics service later
   }
-
-  const [memoryBasket, setMemoryBasket] = useState<string[]>([]) // Declare memoryBasket and setMemoryBasket
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === "CINEMATIC_BACK" || event.data?.type === "CINEMATIC_COMPLETE") {
+        console.log("[v0] Cinematic message received:", event.data.type)
+        // Redirect to Experiences tab
         goExperiences()
       }
     }
@@ -286,25 +287,7 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
   const handleMoodSelect = (mood: string) => {
     setSelectedMood(mood)
     if (mood === "Inspired") {
-      // Show transition overlay
-      setShowTransition(true)
-
-      // After 1 second, redirect to the Feel Engine
-      setTimeout(() => {
-        // Try main URL first, fallback to archive if it fails
-        const mainUrl = "https://secretsbd-visualjourney.vercel.app/"
-        const fallbackUrl = "https://v0-inspired-archive.vercel.app/"
-
-        // Open main URL
-        const newWindow = window.open(mainUrl, "_blank")
-
-        // If window didn't open (blocked), try fallback
-        if (!newWindow || newWindow.closed || typeof newWindow.closed === "undefined") {
-          window.open(fallbackUrl, "_blank")
-        }
-
-        setShowTransition(false)
-      }, 1000)
+      window.open("https://secretsbd-visualjourney.vercel.app/loom", "_blank")
     } else {
       // Other moods go to pathway
       setStep("pathway")
@@ -408,32 +391,6 @@ function Inspire({ onPickMood, goExperiences, imgs }: any) {
     <Screen>
       <div className="h-full flex flex-col overflow-hidden bg-[#0c0c0c]">
         <AppHeader title="Pursuit of Feeling" />
-
-        <AnimatePresence>
-          {showTransition && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-center"
-              >
-                <h2
-                  className="text-3xl font-bold text-[#FFD400] drop-shadow-[0_0_20px_rgba(255,212,0,0.6)]"
-                  style={{ fontFamily: "Playfair Display, serif" }}
-                >
-                  Opening the Feel Engine…
-                </h2>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <AnimatePresence mode="wait">
           {step === "seal" && (
@@ -1353,10 +1310,10 @@ function SiteMap({ go }: { go: (route: string) => void }) {
   const items = [
     { id: "splash", title: "Home (Splash)", desc: "Hero + Inspire Me", action: () => go("splash") },
     {
-      id: "feel",
-      title: "Feel (Mood Funnel)",
+      id: "inspire",
+      title: "Inspire (Mood Funnel)",
       desc: "Curious / Adventurous / Reconnected / Inspired",
-      action: () => go("feel"),
+      action: () => go("inspire"),
     },
     { id: "experiences", title: "Experiences", desc: "Search + filters + list", action: () => go("experiences") },
     { id: "stories", title: "Stories", desc: "Field stories + audio", action: () => go("stories") },
@@ -1422,7 +1379,6 @@ function AccountSection() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
-  const [memoryBasket, setMemoryBasket] = useState<string[]>([]) // Added missing state variable
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -1747,37 +1703,19 @@ function AccountSection() {
 
 /* ===================== BOTTOM NAV ===================== */
 function BottomNav({ active, setActive, showSiteMap }: any) {
-  const Item = ({ id, label, icon: Icon }: any) => {
-    const handleClick = () => {
-      if (id === "feel") {
-        try {
-          window.open("https://secretsbd-visualjourney.vercel.app/", "_blank")
-        } catch {
-          window.open("https://v0-inspired-archive.vercel.app/", "_blank")
-        }
-        return
-      }
-
-      setActive(id)
-    }
-
-    return (
-      <button
-        onClick={handleClick}
-        className={`flex flex-col items-center justify-center gap-1.5 flex-1 py-3 min-h-[56px] ${
-          active === id ? "text-black" : "text-neutral-500"
-        }`}
-      >
-        <Icon className="w-7 h-7" />
-        <span className="text-xs uppercase tracking-widest">{label}</span>
-      </button>
-    )
-  }
-
+  const Item = ({ id, label, icon: Icon }: any) => (
+    <button
+      onClick={() => setActive(id)}
+      className={`flex flex-col items-center justify-center gap-1.5 flex-1 py-3 min-h-[56px] ${active === id ? "text-black" : "text-neutral-500"}`}
+    >
+      <Icon className="w-7 h-7" />
+      <span className="text-xs uppercase tracking-widest">{label}</span>
+    </button>
+  )
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t border-neutral-200 bg-white/90 backdrop-blur pb-6">
       <div className="flex">
-        <Item id="feel" label="Feel" icon={HomeIcon} />
+        <Item id="inspire" label="Feel" icon={HomeIcon} />
         <Item id="experiences" label="Experiences" icon={BookOpen} />
         <Item id="stories" label="Stories" icon={Heart} />
         <Item id="map" label="Map" icon={MapPin} />
@@ -1787,14 +1725,15 @@ function BottomNav({ active, setActive, showSiteMap }: any) {
     </div>
   )
 }
+
 /* ===================== ROOT ===================== */
 export default function SecretsBangladeshApp() {
   const imgs = useBrandImages()
   const [route, setRoute] = useState<
-    "splash" | "feel" | "experiences" | "detail" | "booking" | "stories" | "map" | "account" | "sitemap"
-  >("stories")
+    "splash" | "inspire" | "experiences" | "detail" | "booking" | "stories" | "map" | "account" | "sitemap"
+  >("splash")
   const [detail, setDetail] = useState<any>(null)
-  const [bottom, setBottom] = useState<"feel" | "experiences" | "stories" | "map" | "account" | "sitemap">("stories")
+  const [bottom, setBottom] = useState<"inspire" | "experiences" | "stories" | "map" | "account" | "sitemap">("inspire")
 
   const [showSiteMap, setShowSiteMap] = useState(false)
   useEffect(() => {
@@ -1806,8 +1745,8 @@ export default function SecretsBangladeshApp() {
     const params = new URLSearchParams(window.location.search)
     const moodParam = params.get("mood")
     if (moodParam) {
-      setRoute("feel")
-      setBottom("feel")
+      setRoute("inspire")
+      setBottom("inspire")
       // Trigger the mood pathway display
       setTimeout(() => {
         const moodButton = document.querySelector(`[data-mood="${moodParam}"]`)
@@ -1852,15 +1791,17 @@ export default function SecretsBangladeshApp() {
       <div className="absolute inset-0 flex flex-col">
         <StatusBar />
         <AnimatePresence mode="wait">
-          {route === "splash" && <Splash key="splash" onContinue={() => setRoute("feel")} imgs={imgs} />}
+          {route === "splash" && <Splash key="splash" onContinue={() => setRoute("inspire")} imgs={imgs} />}
 
-          {route === "feel" && (
+          {route === "inspire" && (
             <Inspire
-              key="feel"
+              key="inspire"
               imgs={imgs}
               onPickMood={(mood) => {
                 setBottom("experiences")
                 setRoute("experiences")
+                // The original onPickMood was not used here, so removed.
+                // If needed, it should be passed down and called within handleMoodSelect.
               }}
               goExperiences={() => {
                 setBottom("experiences")
@@ -1873,7 +1814,7 @@ export default function SecretsBangladeshApp() {
             <Experiences
               key="experiences"
               imgs={imgs}
-              onBack={() => setRoute("feel")}
+              onBack={() => setRoute("inspire")}
               onOpenDetail={openDetail}
               activeCategoryId={"all"}
             />
@@ -1894,21 +1835,21 @@ export default function SecretsBangladeshApp() {
 
           {route === "stories" && (
             <Screen key="stories">
-              <AppHeader title="Stories" onBack={() => setRoute("feel")} />
+              <AppHeader title="Stories" onBack={() => setRoute("inspire")} />
               <StoriesSection imgs={imgs} />
             </Screen>
           )}
 
           {route === "map" && (
             <Screen key="map">
-              <AppHeader title="Map" onBack={() => setRoute("feel")} />
+              <AppHeader title="Map" onBack={() => setRoute("inspire")} />
               <MapSection />
             </Screen>
           )}
 
           {route === "account" && (
             <Screen key="account">
-              <AppHeader title="Account" onBack={() => setRoute("feel")} />
+              <AppHeader title="Account" onBack={() => setRoute("inspire")} />
               <AccountSection />
             </Screen>
           )}
@@ -1919,7 +1860,7 @@ export default function SecretsBangladeshApp() {
               go={(to) => {
                 setRoute(to as any)
 
-                const tabRoutes = new Set(["feel", "experiences", "stories", "map", "account", "sitemap"])
+                const tabRoutes = new Set(["inspire", "experiences", "stories", "map", "account", "sitemap"])
                 if (tabRoutes.has(to)) {
                   setBottom(to as any)
                 }
