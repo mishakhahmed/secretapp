@@ -28,12 +28,13 @@ function InspirePageContent() {
 
   const handleMoodSelect = (mood: Mood) => {
     if (mood === "Inspired") {
-      window.location.href = "https://secretsbd-visualjourney.vercel.app/loom"
+      window.location.href = "https://secrets-bespoke.vercel.app/experiences"
       return
     }
 
     setSelectedMood(mood)
     setStep("loom")
+
     setTimeout(() => {
       setStep("ritual")
     }, 3000)
